@@ -84,5 +84,11 @@ namespace IPFLang.Versioning
         IEnumerable<DslReturn> Returns,
         IEnumerable<DslGroup> Groups,
         IEnumerable<DslVerify> Verifications
-    );
+    )
+    {
+        /// <summary>
+        /// Optional version information from VERSION directive
+        /// </summary>
+        public DslVersion? Version { get; init; }
+    };
 }

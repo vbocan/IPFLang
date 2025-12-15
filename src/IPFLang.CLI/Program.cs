@@ -26,6 +26,12 @@ app.Configure(config =>
     config.AddCommand<InfoCommand>("info")
         .WithDescription("Display script metadata (inputs, fees, groups, version)")
         .WithExample("info", "examples/01_epo_filing.ipf");
+
+    config.AddCommand<ComposeCommand>("compose")
+        .WithDescription("Compose multiple IPFLang scripts with jurisdiction inheritance")
+        .WithExample("compose", "base.ipf", "child.ipf")
+        .WithExample("compose", "epo_base.ipf", "epo_de.ipf", "--analysis")
+        .WithExample("compose", "epo_base.ipf", "epo_de.ipf", "--provenance");
 });
 
 return app.Run(args);

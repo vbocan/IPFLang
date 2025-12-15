@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using IPFLang.Versioning;
 
 namespace IPFLang.Parser
 {
@@ -29,6 +30,8 @@ namespace IPFLang.Parser
 
         public bool Parse(string source)
         {
+            Reset();
+            
             Func<string[], bool>[] IPFParsers = new Func<string[], bool>[]
             {
                 ParseVersion,
@@ -112,6 +115,31 @@ namespace IPFLang.Parser
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Parse with option to return a ParsedScript (used for jurisdiction composition)
+        /// </summary>
+        public (ParsedScript?, IEnumerable<string>) Parse(string source, bool returnParsedScript)
+        {
+            var success = Parse(source);
+            if (!success)
+            {
+                return (null, IPFErrors.Select(e => e.Item2));
+            }
+
+            var parsedScript = new ParsedScript(
+                IPFInputs.ToList(),
+                IPFFees.ToList(),
+                IPFReturns.ToList(),
+                IPFGroups.ToList(),
+                IPFVerifications.ToList()
+            )
+            {
+                Version = IPFVersion
+            };
+
+            return (parsedScript, Enumerable.Empty<string>());
         }
 
         /// <summary>
@@ -726,6 +754,21 @@ namespace IPFLang.Parser
             IPFVerifications.Clear();
             IPFErrors.Clear();
             IPFVersion = null;
+        }
+        #endregion
+
+        #region LoadParsedScript
+        /// <summary>
+        /// Load a pre-parsed script (used for jurisdiction composition)
+        /// </summary>
+        public void LoadParsedScript(ParsedScript script)
+        {
+            Reset();
+            foreach (var input in script.Inputs) IPFInputs.Add(input);
+            foreach (var fee in script.Fees) IPFFees.Add(fee);
+            foreach (var ret in script.Returns) IPFReturns.Add(ret);
+            foreach (var group in script.Groups) IPFGroups.Add(group);
+            foreach (var verify in script.Verifications) IPFVerifications.Add(verify);
         }
         #endregion
 

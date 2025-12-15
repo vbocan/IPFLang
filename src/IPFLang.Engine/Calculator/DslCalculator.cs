@@ -4,6 +4,7 @@ using IPFLang.Evaluator;
 using IPFLang.Parser;
 using IPFLang.Provenance;
 using IPFLang.Types;
+using IPFLang.Versioning;
 
 namespace IPFLang.Engine
 {
@@ -120,6 +121,15 @@ namespace IPFLang.Engine
         public void Reset()
         {
             Parser.Reset();
+        }
+
+        /// <summary>
+        /// Load a pre-parsed script (used for jurisdiction composition)
+        /// </summary>
+        public void LoadParsedScript(ParsedScript script)
+        {
+            Parser.LoadParsedScript(script);
+            _typeErrors = TypeChecker.Check(Parser.GetInputs(), Parser.GetFees());
         }
 
         public CompletenessReport VerifyCompleteness()
