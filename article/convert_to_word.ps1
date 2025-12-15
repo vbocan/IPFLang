@@ -1,0 +1,1 @@
+docker run --rm -v "${PWD}/article:/data" pandoc/core -s IPFLang_CSI_Article.md -o IPFLang_CSI_Article.docx --mathml
