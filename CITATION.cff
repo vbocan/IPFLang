@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "IPFLang: Domain-Specific Language for Intellectual Property Fee Calculations"
+version: 1.0.0
+date-released: 2025-12-15
+abstract: "A domain-specific language and execution engine for defining intellectual property fee calculations with advanced features including currency-aware type system, completeness verification, provenance tracking, temporal operations, and version management."
+authors:
+  - family-names: "Bocan"
+    given-names: "Valer"
+    name-suffix: "Ph.D., CSSLP"
+    email: "valer.bocan@upt.ro"
+    orcid: "https://orcid.org/0009-0006-9084-4064"
+repository-code: "https://github.com/vbocan/ipflang"
+url: "https://github.com/vbocan/ipflang"
+license: GPL-3.0
+keywords:
+  - domain-specific language
+  - intellectual property
+  - fee calculation
+  - patent fees
+  - legal technology
+  - type system
+  - currency conversion
+  - provenance tracking
+  - version management
+  - completeness verification
+  - monotonicity checking
+type: software
