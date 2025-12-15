@@ -475,9 +475,25 @@ IPFLang employs a dimensional type system preventing cross-currency arithmetic e
 
 The type language extends basic types with currency-parameterized amounts:
 
-```
-τ ::= Num | Bool | Sym | Date | StrList | Amt[c] | α
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mi>τ</mi>
+    <mo>::=</mo>
+    <mi>Num</mi>
+    <mo>|</mo>
+    <mi>Bool</mi>
+    <mo>|</mo>
+    <mi>Sym</mi>
+    <mo>|</mo>
+    <mi>Date</mi>
+    <mo>|</mo>
+    <mi>StrList</mi>
+    <mo>|</mo>
+    <mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo>
+    <mo>|</mo>
+    <mi>α</mi>
+  </mrow>
+</math>
 
 where:
 - `Num` represents dimensionless numbers
@@ -494,81 +510,214 @@ Let Γ denote a typing environment mapping identifiers to types, written Γ(x) =
 
 **Literals and Variables:**
 
-```
-                              Γ(x) = τ
-[T-NUM]  ─────────────   [T-VAR]  ─────────
-         Γ ⊢ n : Num              Γ ⊢ x : τ
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-NUM]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>n</mi><mo>:</mo><mi>Num</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
-              c ∈ ISO-4217
-[T-CURR]  ─────────────────────
-          Γ ⊢ n⟨c⟩ : Amt[c]
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-VAR]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>τ</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>x</mi><mo>:</mo><mi>τ</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
+
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-CURR]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>c</mi><mo>∈</mo><mtext>ISO-4217</mtext></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>n</mi><mo>⟨</mo><mi>c</mi><mo>⟩</mo><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 **Arithmetic Operations:**
 
-```
-         Γ ⊢ e₁ : Num    Γ ⊢ e₂ : Num
-[T-ADD-NUM]  ─────────────────────────────
-             Γ ⊢ e₁ + e₂ : Num
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-ADD-NUM]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><mi>Num</mi><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Num</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Num</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
-         Γ ⊢ e₁ : Amt[c]    Γ ⊢ e₂ : Amt[c]
-[T-ADD-AMT]  ─────────────────────────────────
-             Γ ⊢ e₁ + e₂ : Amt[c]
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-ADD-AMT]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>+</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
-         Γ ⊢ e₁ : Amt[c]    Γ ⊢ e₂ : Num
-[T-MUL-SCALAR-R]  ───────────────────────────
-                  Γ ⊢ e₁ * e₂ : Amt[c]
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-MUL-SCALAR-R]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Num</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>×</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
-         Γ ⊢ e₁ : Num    Γ ⊢ e₂ : Amt[c]
-[T-MUL-SCALAR-L]  ───────────────────────────
-                  Γ ⊢ e₁ * e₂ : Amt[c]
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-MUL-SCALAR-L]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><mi>Num</mi><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>×</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 The rule T-ADD-AMT is critical: it requires both operands to have identical currency tags. No rule permits `Amt[c₁] + Amt[c₂]` when c₁ ≠ c₂. The rules T-MUL-SCALAR-R and T-MUL-SCALAR-L ensure scalar multiplication is commutative: both `amount * scalar` and `scalar * amount` are well-typed.
 
 **Currency Conversion:**
 
-```
-         Γ ⊢ e : Amt[c₁]    c₂ ∈ ISO-4217
-[T-CONVERT]  ────────────────────────────────
-             Γ ⊢ CONVERT(e, c₁, c₂) : Amt[c₂]
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-CONVERT]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>e</mi><mo>:</mo><mi>Amt</mi><mo>[</mo><msub><mi>c</mi><mn>1</mn></msub><mo>]</mo><mspace width="1em"/><msub><mi>c</mi><mn>2</mn></msub><mo>∈</mo><mtext>ISO-4217</mtext></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>CONVERT</mi><mo>(</mo><mi>e</mi><mo>,</mo><msub><mi>c</mi><mn>1</mn></msub><mo>,</mo><msub><mi>c</mi><mn>2</mn></msub><mo>)</mo><mo>:</mo><mi>Amt</mi><mo>[</mo><msub><mi>c</mi><mn>2</mn></msub><mo>]</mo></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 **Comparisons and Conditions:**
 
-```
-         Γ ⊢ e₁ : τ    Γ ⊢ e₂ : τ    ⊕ ∈ {EQ, NEQ, GT, LT, GTE, LTE}
-[T-COMP]  ──────────────────────────────────────────────────────────────
-          Γ ⊢ e₁ ⊕ e₂ : Bool
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-COMP]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><mi>τ</mi><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>τ</mi><mspace width="1em"/><mo>⊕</mo><mo>∈</mo><mo>{</mo><mi>EQ</mi><mo>,</mo><mi>NEQ</mi><mo>,</mo><mi>GT</mi><mo>,</mo><mi>LT</mi><mo>,</mo><mi>GTE</mi><mo>,</mo><mi>LTE</mi><mo>}</mo></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>⊕</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><mi>Bool</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
-         Γ ⊢ φ₁ : Bool    Γ ⊢ φ₂ : Bool
-[T-AND]  ────────────────────────────────
-         Γ ⊢ φ₁ AND φ₂ : Bool
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-AND]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>φ</mi><mn>1</mn></msub><mo>:</mo><mi>Bool</mi><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><msub><mi>φ</mi><mn>2</mn></msub><mo>:</mo><mi>Bool</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>φ</mi><mn>1</mn></msub><mspace width="0.3em"/><mi>AND</mi><mspace width="0.3em"/><msub><mi>φ</mi><mn>2</mn></msub><mo>:</mo><mi>Bool</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 **Let Bindings:**
 
-```
-         Γ ⊢ e₁ : τ₁    Γ[x ↦ τ₁] ⊢ e₂ : τ₂
-[T-LET]  ─────────────────────────────────────
-         Γ ⊢ LET x AS e₁; e₂ : τ₂
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-LET]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><msub><mi>e</mi><mn>1</mn></msub><mo>:</mo><msub><mi>τ</mi><mn>1</mn></msub><mspace width="1em"/><mi>Γ</mi><mo>[</mo><mi>x</mi><mo>↦</mo><msub><mi>τ</mi><mn>1</mn></msub><mo>]</mo><mo>⊢</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><msub><mi>τ</mi><mn>2</mn></msub></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mtext>LET</mtext><mspace width="0.3em"/><mi>x</mi><mspace width="0.3em"/><mtext>AS</mtext><mspace width="0.3em"/><msub><mi>e</mi><mn>1</mn></msub><mo>;</mo><msub><mi>e</mi><mn>2</mn></msub><mo>:</mo><msub><mi>τ</mi><mn>2</mn></msub></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 **Yield Statements:**
 
-```
-         Γ ⊢ e : τ    Γ ⊢ φ : Bool
-[T-YIELD]  ────────────────────────────
-           Γ ⊢ YIELD e IF φ : τ
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-YIELD]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>⊢</mo><mi>e</mi><mo>:</mo><mi>τ</mi><mspace width="1em"/><mi>Γ</mi><mo>⊢</mo><mi>φ</mi><mo>:</mo><mi>Bool</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mtext>YIELD</mtext><mspace width="0.3em"/><mi>e</mi><mspace width="0.3em"/><mtext>IF</mtext><mspace width="0.3em"/><mi>φ</mi><mo>:</mo><mi>τ</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 **Polymorphic Fees:**
 
-```
-         Γ[α ↦ ∀] ⊢ body : α
-[T-POLY]  ─────────────────────────────────
-          Γ ⊢ FEE⟨α⟩ body : ∀α. α
-```
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable columnalign="left">
+    <mtr>
+      <mtd>
+        <mtext>[T-POLY]</mtext>
+        <mspace width="2em"/>
+        <mfrac linethickness="1px">
+          <mrow><mi>Γ</mi><mo>[</mo><mi>α</mi><mo>↦</mo><mo>∀</mo><mo>]</mo><mo>⊢</mo><mi>body</mi><mo>:</mo><mi>α</mi></mrow>
+          <mrow><mi>Γ</mi><mo>⊢</mo><mtext>FEE</mtext><mo>⟨</mo><mi>α</mi><mo>⟩</mo><mspace width="0.3em"/><mi>body</mi><mo>:</mo><mo>∀</mo><mi>α</mi><mo>.</mo><mi>α</mi></mrow>
+        </mfrac>
+      </mtd>
+    </mtr>
+  </mtable>
+</math>
 
 #### 4.1.3 Type Safety
 
@@ -614,7 +763,13 @@ IPFLang supports static analysis to determine whether fee computations produce d
 
 **Definition 3 (Coverage).** For fee f with conditional yields guarded by conditions φ₁, ..., φₙ, the coverage is:
 
-Cov(f) = {σ ∈ Σ : ∃i. σ ⊨ φᵢ}
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mi>Cov</mi><mo>(</mo><mi>f</mi><mo>)</mo>
+    <mo>=</mo>
+    <mo>{</mo><mi>σ</mi><mo>∈</mo><mi>Σ</mi><mo>:</mo><mo>∃</mo><mi>i</mi><mo>.</mo><mspace width="0.3em"/><mi>σ</mi><mo>⊨</mo><msub><mi>φ</mi><mi>i</mi></msub><mo>}</mo>
+  </mrow>
+</math>
 
 **Definition 4 (Completeness).** Fee f is *complete* if Cov(f) = Σ, equivalently if φ₁ ∨ ... ∨ φₙ is valid over Σ.
 
@@ -700,7 +855,19 @@ Fee schedules should exhibit predictable behavior: increasing claim count should
 
 **Definition 5 (Monotonicity).** Let f: Σ → ℝ be a fee function, x ∈ Vars a numeric input, and σ₋ₓ a partial valuation excluding x. Fee f is *non-decreasing* with respect to x if:
 
-∀σ₋ₓ. ∀v₁, v₂ ∈ Dom(x). v₁ < v₂ ⟹ f(σ₋ₓ[x ↦ v₁]) ≤ f(σ₋ₓ[x ↦ v₂])
+<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mrow>
+    <mo>∀</mo><msub><mi>σ</mi><mrow><mo>−</mo><mi>x</mi></mrow></msub><mo>.</mo>
+    <mspace width="0.3em"/>
+    <mo>∀</mo><msub><mi>v</mi><mn>1</mn></msub><mo>,</mo><msub><mi>v</mi><mn>2</mn></msub><mo>∈</mo><mi>Dom</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>.</mo>
+    <mspace width="0.3em"/>
+    <msub><mi>v</mi><mn>1</mn></msub><mo>&lt;</mo><msub><mi>v</mi><mn>2</mn></msub>
+    <mo>⟹</mo>
+    <mi>f</mi><mo>(</mo><msub><mi>σ</mi><mrow><mo>−</mo><mi>x</mi></mrow></msub><mo>[</mo><mi>x</mi><mo>↦</mo><msub><mi>v</mi><mn>1</mn></msub><mo>]</mo><mo>)</mo>
+    <mo>≤</mo>
+    <mi>f</mi><mo>(</mo><msub><mi>σ</mi><mrow><mo>−</mo><mi>x</mi></mrow></msub><mo>[</mo><mi>x</mi><mo>↦</mo><msub><mi>v</mi><mn>2</mn></msub><mo>]</mo><mo>)</mo>
+  </mrow>
+</math>
 
 Analogously: *non-increasing* (≥), *strictly increasing* (>), *strictly decreasing* (<).
 
