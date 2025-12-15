@@ -56,7 +56,7 @@ namespace IPFLang.Engine.Tests
 
             Assert.True(report.HasChanges);
             Assert.Equal(1, report.AddedCount);
-            Assert.Single(report.FeeChanges.Where(c => c.Type == ChangeType.Added));
+            Assert.Single(report.FeeChanges, c => c.Type == ChangeType.Added);
             Assert.Equal("ExaminationFee", report.FeeChanges.First(c => c.Type == ChangeType.Added).FeeName);
         }
 

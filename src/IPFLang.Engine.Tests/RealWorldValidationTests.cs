@@ -59,7 +59,7 @@ namespace IPFLang.Engine.Tests
             var issues = validator.ValidateChronology().ToList();
 
             // No chronology errors expected
-            Assert.Empty(issues.Where(i => i.Severity == IssueSeverity.Error));
+            Assert.DoesNotContain(issues, i => i.Severity == IssueSeverity.Error);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace IPFLang.Engine.Tests
             var issues = validator.ValidateExpectedChanges("2023.1", "2024.1", expectedChanges).ToList();
 
             // Should find the expected change
-            Assert.Empty(issues.Where(i => i.Severity == IssueSeverity.Warning));
+            Assert.DoesNotContain(issues, i => i.Severity == IssueSeverity.Warning);
         }
 
         [Fact]

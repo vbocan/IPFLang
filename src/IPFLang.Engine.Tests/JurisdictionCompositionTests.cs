@@ -214,8 +214,8 @@ namespace IPFLang.Engine.Tests
             var analysis = composer.AnalyzeInheritance("EPO-DE");
 
             Assert.Equal(2, analysis.InheritedFees.Count); // FilingFee, SearchFee
-            Assert.Equal(1, analysis.DefinedFees.Count);   // ExaminationFee
-            Assert.Equal(0, analysis.OverriddenFees.Count);
+            Assert.Single(analysis.DefinedFees);   // ExaminationFee
+            Assert.Empty(analysis.OverriddenFees);
             Assert.True(analysis.ReusePercentage > 50);
         }
 
@@ -236,9 +236,9 @@ namespace IPFLang.Engine.Tests
             var composer = new JurisdictionComposer(registry);
             var analysis = composer.AnalyzeInheritance("EPO-DE");
 
-            Assert.Equal(1, analysis.InheritedFees.Count);  // SearchFee
-            Assert.Equal(1, analysis.OverriddenFees.Count); // FilingFee
-            Assert.Equal(1, analysis.DefinedFees.Count);    // ExaminationFee
+            Assert.Single(analysis.InheritedFees);  // SearchFee
+            Assert.Single(analysis.OverriddenFees); // FilingFee
+            Assert.Single(analysis.DefinedFees);    // ExaminationFee
         }
 
         [Fact]
