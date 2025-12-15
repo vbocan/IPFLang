@@ -11,7 +11,7 @@ ORCID: 0009-0006-9084-4064
 
 ## Abstract
 
-The intellectual property management industry faces interoperability challenges due to fragmented fee calculation implementations across patent offices. This paper presents IPFLang, a domain-specific language for encoding jurisdiction-specific fee calculation rules. IPFLang provides: (1) a formal EBNF grammar with declarative fee computation blocks; (2) a currency-aware type system supporting 161 ISO 4217 currencies that prevents cross-currency arithmetic errors at compile time; (3) static verification of fee completeness and monotonicity; and (4) provenance tracking for auditability. We present formal typing rules with a type safety argument, verification algorithms with complexity analysis, and validation against official EPO and USPTO fee schedules. The reference CLI implementation validates the design with 266 tests and sub-millisecond execution times. IPFLang establishes a foundation for regulatory calculation standardization, combining practical DSL design with formal correctness guarantees.
+The intellectual property management industry faces interoperability challenges due to fragmented fee calculation implementations across patent offices. This paper presents IPFLang, a domain-specific language for encoding jurisdiction-specific fee calculation rules. IPFLang provides: (1) a formal EBNF grammar with declarative fee computation blocks; (2) a currency-aware type system supporting 161 ISO 4217 currencies that prevents cross-currency arithmetic errors at compile time; (3) static analysis of fee completeness (with formal guarantees for bounded domains) and monotonicity; and (4) provenance tracking for auditability. We present formal typing rules with a type safety argument, analysis algorithms with complexity bounds, and validation against official EPO and USPTO fee schedules. The reference CLI implementation validates the design with 266 tests and sub-millisecond execution times. IPFLang establishes a foundation for regulatory calculation standardization, combining practical DSL design with formal correctness guarantees.
 
 **Keywords:** intellectual property, domain-specific language, type systems, static verification, regulatory automation, legal technology, software standards
 
@@ -21,7 +21,7 @@ The intellectual property management industry faces interoperability challenges 
 
 - Formal DSL specification for multi-jurisdiction IP fee calculations
 - Currency-aware type system with 161 ISO 4217 currencies preventing cross-currency errors statically
-- Static verification of fee completeness and monotonicity with formal algorithms
+- Static analysis of fee completeness (formal guarantees for bounded domains) and monotonicity
 - Provenance tracking with counterfactual analysis for auditability
 - Validation against official EPO and USPTO fee schedules
 - Open-source reference implementation at github.com/vbocan/IPFLang
@@ -52,7 +52,7 @@ The IP technology domain lacks equivalent standards for fee calculation, resulti
 
 This work addresses four fundamental questions regarding standardization of IP fee calculations.
 
-The first research question concerns language design: can a domain-specific language provide sufficient expressiveness for complex regulatory fee structures while remaining comprehensible to legal professionals with minimal technical training? The second addresses formal correctness: what static guarantees can a type system and verification framework provide for multi-currency regulatory calculations? The third focuses on verification: how can completeness and monotonicity properties be statically verified to ensure fee definitions behave correctly? The fourth explores practical feasibility: can a DSL-based approach achieve acceptable performance for production use?
+The first research question concerns language design: can a domain-specific language provide sufficient expressiveness for complex regulatory fee structures while employing syntax designed for readability by domain experts? The second addresses formal correctness: what static guarantees can a type system and verification framework provide for multi-currency regulatory calculations? The third focuses on verification: how can completeness and monotonicity properties be statically verified to ensure fee definitions behave correctly? The fourth explores practical feasibility: can a DSL-based approach achieve acceptable performance for production use?
 
 This paper presents IPFLang (Intellectual Property Fees Language), a domain-specific language standard for multi-jurisdiction fee calculations, with five principal contributions:
 
@@ -108,7 +108,7 @@ Business Rules Management Systems such as Drools [13] provide general-purpose ru
 
 Some governments have begun pursuing rules-as-code initiatives that encode regulations in executable formats [14, 15]. New Zealand's "Better Rules" program and similar initiatives in Australia and France explore machine-consumable legislation. These initiatives typically use general-purpose languages rather than domain-specific languages, limiting accessibility to legal experts who must rely on programmers for implementation.
 
-**[INSERT FIGURE 1: Comparison of Legal DSLs and Rules Engines]**
+**[INSERT FIGURE 1: figures/figure1_dsl_comparison.mmd - Comparison of Legal DSLs and Rules Engines]**
 
 Table 1 provides a systematic comparison of IPFLang with related approaches.
 
@@ -116,17 +116,17 @@ Table 1 provides a systematic comparison of IPFLang with related approaches.
 |---------|---------|--------|-------------|--------|-----------|
 | Primary Domain | IP fees | Tax law | Compliance | General | Tax-benefit |
 | Type Safety | Currency-aware | Dependent types | None | None | Runtime |
-| Multi-currency | 161 ISO 4217 | No | No | No | Limited |
+| Multi-currency | Built-in (161 ISO 4217) | User-definable | No | No | Limited |
 | Static Verification | Completeness, Monotonicity | Exhaustiveness | Defeasibility | None | None |
 | Syntax Style | Declarative keywords | Literate | XML | Drools DRL | Python |
-| Target User | Legal professionals | Formal methods experts | Ontology engineers | Developers | Developers |
+| Target User | Domain experts | Formal methods experts | Ontology engineers | Developers | Developers |
 | Multi-jurisdiction | Composition | No | No | No | Yes |
 | Provenance | Built-in | No | No | Audit log | No |
 | License | GPLv3 | Apache 2.0 | OASIS | Apache 2.0 | AGPL |
 
 *Table 1: Comparison of Legal DSLs and Rules Engines*
 
-IPFLang differentiates itself through the combination of domain-specific syntax designed for legal professionals, multi-currency type safety preventing common arithmetic errors, static verification of completeness and monotonicity, and explicit support for multi-jurisdiction fee structures with inheritance and composition.
+IPFLang differentiates itself through the combination of domain-specific syntax designed for readability, first-class multi-currency type safety with all 161 ISO 4217 currencies as built-in primitives, static verification of completeness and monotonicity, and explicit support for multi-jurisdiction fee structures with inheritance and composition. While languages like Catala could theoretically support currency types through user-defined abstractions, IPFLang provides these as language primitives requiring no additional implementation effort.
 
 ---
 
@@ -134,11 +134,11 @@ IPFLang differentiates itself through the combination of domain-specific syntax 
 
 ### 3.1 Design Principles
 
-IPFLang design balances five competing objectives: expressiveness for complex regulatory logic, comprehensibility for legal professionals, deterministic execution for financial accuracy, extensibility for evolving regulations, and formal verification potential.
+IPFLang design balances five competing objectives: expressiveness for complex regulatory logic, readability through domain-specific syntax designed for legal professionals, deterministic execution for financial accuracy, extensibility for evolving regulations, and formal verification potential.
 
 The first principle is declarative semantics. Fee calculations specify what to compute rather than how to compute it. Declarative approaches facilitate correctness verification by legal experts who can validate fee formulas directly against official schedules without needing to understand imperative control flow.
 
-The second principle requires explicit semantics. Operators use keyword syntax such as EQ, GT, AND, and OR rather than symbols like ==, >, &&, and ||. This approach avoids ambiguity and improves readability for non-programmers, aligning with DSL design guidelines emphasizing domain-specific notation [16].
+The second principle requires explicit semantics. Operators use keyword syntax such as EQ, GT, AND, and OR rather than symbols like ==, >, &&, and ||. This design choice aims to improve readability for users with varying technical backgrounds, aligning with DSL design guidelines emphasizing domain-specific notation [16]. Empirical validation of this readability hypothesis remains future work (see Section 8.3).
 
 The third principle establishes a static type system. Input declarations explicitly specify types including NUMBER, LIST, MULTILIST, BOOLEAN, DATE, and AMOUNT, enabling compile-time validation. Static typing prevents runtime errors from type mismatches and provides clear parameter documentation.
 
@@ -197,7 +197,7 @@ ENDDEFINE
 
 #### 3.4.2 MULTILIST (Multi-Choice Enumeration)
 
-The MULTILIST type accommodates parameters allowing multiple selections. The special property `!COUNT` returns the number of selections.
+The MULTILIST type accommodates parameters allowing multiple selections. The special property accessor `!COUNT` returns the number of selections. IPFLang uses the exclamation mark (`!`) as the property accessor to distinguish property access from other syntactic elements and to provide visual emphasis for these computed properties, which derive values from the underlying data rather than representing stored values directly.
 
 ```
 DEFINE MULTILIST Countries AS 'Select validation countries'
@@ -516,11 +516,15 @@ Let Γ denote a typing environment mapping identifiers to types, written Γ(x) =
              Γ ⊢ e₁ + e₂ : Amt[c]
 
          Γ ⊢ e₁ : Amt[c]    Γ ⊢ e₂ : Num
-[T-MUL-SCALAR]  ───────────────────────────
-                Γ ⊢ e₁ * e₂ : Amt[c]
+[T-MUL-SCALAR-R]  ───────────────────────────
+                  Γ ⊢ e₁ * e₂ : Amt[c]
+
+         Γ ⊢ e₁ : Num    Γ ⊢ e₂ : Amt[c]
+[T-MUL-SCALAR-L]  ───────────────────────────
+                  Γ ⊢ e₁ * e₂ : Amt[c]
 ```
 
-The rule T-ADD-AMT is critical: it requires both operands to have identical currency tags. No rule permits `Amt[c₁] + Amt[c₂]` when c₁ ≠ c₂.
+The rule T-ADD-AMT is critical: it requires both operands to have identical currency tags. No rule permits `Amt[c₁] + Amt[c₂]` when c₁ ≠ c₂. The rules T-MUL-SCALAR-R and T-MUL-SCALAR-L ensure scalar multiplication is commutative: both `amount * scalar` and `scalar * amount` are well-typed.
 
 **Currency Conversion:**
 
@@ -577,10 +581,10 @@ The rule T-ADD-AMT is critical: it requires both operands to have identical curr
 
 *Base cases:* Numeric literals have type Num by T-NUM. Currency literals n⟨c⟩ have type Amt[c] by T-CURR, where c is validated against the ISO-4217 database.
 
-*Inductive cases:* For T-ADD-AMT, both operands must have type Amt[c] for the same c; the result preserves this currency tag. For T-MUL-SCALAR, the currency of the Amt operand is preserved. For T-CONVERT, the explicit conversion changes the currency tag from c₁ to c₂, requiring runtime exchange rate lookup.
+*Inductive cases:* For T-ADD-AMT, both operands must have type Amt[c] for the same c; the result preserves this currency tag. For T-MUL-SCALAR-R and T-MUL-SCALAR-L, the currency of the Amt operand is preserved regardless of operand order. For T-CONVERT, the explicit conversion changes the currency tag from c₁ to c₂, requiring runtime exchange rate lookup.
 
 The type checker implementation (`CurrencyTypeChecker.cs`) enforces these rules, rejecting programs that violate conditions (1)-(3) before evaluation. Specifically:
-- `InferArithmeticType()` implements T-ADD-AMT and T-MUL-SCALAR
+- `InferArithmeticType()` implements T-ADD-AMT, T-MUL-SCALAR-R, and T-MUL-SCALAR-L
 - `InferConvertType()` implements T-CONVERT
 - `TypeError.MixedCurrencyArithmetic()` signals violations of condition (1)
 
@@ -594,9 +598,9 @@ YIELD FilingFee + SearchFee   -- where FilingFee:Amt[EUR], SearchFee:Amt[USD]
 YIELD FilingFee + CONVERT(SearchFee, USD, EUR)
 ```
 
-### 4.2 Completeness Verification
+### 4.2 Completeness Analysis
 
-IPFLang supports static verification that fee computations produce defined outputs for all valid input combinations, eliminating undefined behavior.
+IPFLang supports static analysis to determine whether fee computations produce defined outputs for all valid input combinations. The analysis operates in two modes: *exhaustive verification* for small domains providing formal guarantees, and *boundary-based testing* for large domains providing high-confidence heuristic assurance.
 
 #### 4.2.1 Formal Definitions
 
@@ -614,12 +618,14 @@ Cov(f) = {σ ∈ Σ : ∃i. σ ⊨ φᵢ}
 
 **Definition 4 (Completeness).** Fee f is *complete* if Cov(f) = Σ, equivalently if φ₁ ∨ ... ∨ φₙ is valid over Σ.
 
-#### 4.2.2 Verification Algorithm
+#### 4.2.2 Analysis Algorithm
 
-**[INSERT FIGURE 2: Completeness Verification Algorithm]**
+The completeness analysis employs two strategies depending on domain size:
+
+**[INSERT FIGURE 2: figures/figure2_completeness_algorithm.mmd - Completeness Analysis Algorithm Flowchart]**
 
 ```
-Algorithm 1: Completeness Verification
+Algorithm 1: Completeness Analysis
 ─────────────────────────────────────────────────────────────────────
 Input:  Fee f with conditions Φ = {φ₁, ..., φₙ}
         Input domains D = {D₁, ..., Dₘ}
@@ -630,25 +636,27 @@ Output: (complete: Bool, gaps: Set⟨InputCombination⟩)
  3: gaps ← ∅
  4:
  5: if |Σ| ≤ EXHAUSTIVE_THRESHOLD then        // Default: 10⁶
- 6:     for each σ ∈ Σ do                      // Exhaustive enumeration
- 7:         if ¬∃φᵢ ∈ Φ : σ ⊨ φᵢ then
- 8:             gaps ← gaps ∪ {σ}
- 9:             if |gaps| ≥ MAX_GAPS then break
-10: else
-11:     S ← SampleRepresentative(D)           // Boundary sampling
-12:     for each σ ∈ S do
-13:         if ¬∃φᵢ ∈ Φ : σ ⊨ φᵢ then
-14:             gaps ← gaps ∪ {σ}
-15:
-16: return (gaps = ∅, gaps)
+ 6:     // EXHAUSTIVE VERIFICATION (provides formal guarantee)
+ 7:     for each σ ∈ Σ do
+ 8:         if ¬∃φᵢ ∈ Φ : σ ⊨ φᵢ then
+ 9:             gaps ← gaps ∪ {σ}
+10:             if |gaps| ≥ MAX_GAPS then break
+11: else
+12:     // BOUNDARY-BASED TESTING (heuristic, no formal guarantee)
+13:     S ← SampleRepresentative(D)           // Boundary sampling
+14:     for each σ ∈ S do
+15:         if ¬∃φᵢ ∈ Φ : σ ⊨ φᵢ then
+16:             gaps ← gaps ∪ {σ}
+17:
+18: return (gaps = ∅, gaps)
 ```
 
 #### 4.2.3 Complexity Analysis
 
 **Theorem 2 (Verification Complexity).** Let n = |Φ| (number of yield conditions), m = |D| (number of inputs), k = average condition evaluation cost (typically O(m) for conjunctive conditions), and N = |Σ| (domain size).
 
-- **Exhaustive mode** (N ≤ 10⁶): O(N · n · k) time, O(|gaps|) space
-- **Sampling mode** (N > 10⁶): O(S · n · k) time where S = O(5ᵐ) for boundary sampling with 5 representatives per domain
+- **Exhaustive verification** (N ≤ 10⁶): O(N · n · k) time, O(|gaps|) space. Provides formal guarantee.
+- **Boundary-based testing** (N > 10⁶): O(S · n · k) time where S = O(5ᵐ) for boundary sampling with 5 representatives per domain. Provides heuristic assurance only.
 
 #### 4.2.4 Sampling Strategy
 
@@ -662,7 +670,7 @@ For Boolean domains: both TRUE and FALSE (exhaustive).
 For LIST domains: all choices (exhaustive up to cardinality limit).
 For MULTILIST domains: empty set, singleton sets, full set.
 
-#### 4.2.5 Soundness and Completeness
+#### 4.2.5 Soundness and Guarantees
 
 **Proposition 1 (Soundness of Exhaustive Mode).** If the exhaustive algorithm reports complete, the fee is genuinely complete.
 
@@ -670,7 +678,7 @@ For MULTILIST domains: empty set, singleton sets, full set.
 
 **Proposition 2 (Completeness of Exhaustive Mode).** If a gap exists, the exhaustive algorithm will find it (up to MAX_GAPS reporting limit).
 
-**Remark (Sampling Mode Limitations).** The sampling algorithm may produce false negatives (miss gaps that fall between sampled points). It prioritizes boundary values to maximize gap detection for common fee patterns. Users requiring guarantees should ensure domain sizes permit exhaustive verification.
+**Remark (Boundary-Based Testing Limitations).** The boundary-based testing mode may produce false negatives (miss gaps that fall between sampled points). It is designed to maximize gap detection for common fee patterns by prioritizing boundary values, threshold values extracted from conditions, and representative samples. **This mode does not provide formal guarantees**; users requiring provable completeness should ensure domain sizes permit exhaustive verification or employ manual analysis.
 
 **Example - Gap Detection:**
 ```
@@ -746,9 +754,9 @@ Each fee evaluation generates provenance records documenting:
 - The selected YIELD expression and its computed value
 - Final fee amount with currency
 
-This trace enables legal professionals to verify calculations against official schedules and assists in dispute resolution.
+This trace enables practitioners to verify calculations against official schedules and assists in dispute resolution.
 
-**[INSERT FIGURE 3: Provenance Record Structure]**
+**[INSERT FIGURE 3: figures/figure3_provenance_structure.mmd - Provenance Record Structure]**
 
 ### 5.2 Counterfactual Analysis
 
@@ -771,7 +779,7 @@ This capability supports budget planning, client advisory, and regulatory impact
 
 ### 6.1 Architecture Overview
 
-**[INSERT FIGURE 4: IPFLang Engine Architecture]**
+**[INSERT FIGURE 4: figures/figure4_architecture.mmd - IPFLang Engine Architecture]**
 
 The IPFLang reference implementation comprises approximately 15,000 lines of C# targeting .NET 10.0, organized into modular subsystems:
 
@@ -921,7 +929,7 @@ Table 3 presents validation results for the USPTO fee calculator against the off
 
 **Methodology:** Expected values were computed from the USPTO fee schedule [1] effective January 19, 2025. The IPFLang script reflects the updated entity discount structure (60% small, 80% micro).
 
-All 14 validation test cases produced exact matches with official calculations, demonstrating IPFLang's accuracy for production fee calculations.
+All 14 representative test scenarios covering the major fee calculation patterns (base fees, excess claims at multiple tiers, entity discounts, application types, and surcharges) produced exact matches with official calculations, demonstrating IPFLang's accuracy for production fee calculations.
 
 ### 7.3 Test Suite
 
@@ -947,7 +955,7 @@ All 266 tests pass with 100% success rate. Test execution completes in approxima
 
 **External Validity.** The 20 example files demonstrate language expressiveness but do not constitute production-scale jurisdiction coverage. The EPO and USPTO examples were selected for their fee structure complexity and public availability of official schedules. Generalization to all 118+ patent offices requires additional implementation effort.
 
-**Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about comprehensibility for legal professionals are based on design principles rather than empirical user studies; the syntax was designed for readability but has not been validated through controlled experiments with practitioners.
+**Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
 
 **Reliability.** Results are reproducible via the open-source implementation. The validation test cases can be independently verified against official fee schedule documents. Exchange rate-dependent calculations (not present in the current examples) would introduce temporal variation.
 
@@ -957,9 +965,9 @@ All 266 tests pass with 100% success rate. Test execution completes in approxima
 
 ### 8.1 Advantages of DSL-Based Standardization
 
-**Transparency and auditability.** Unlike black-box proprietary calculators, IPFLang scripts are human-readable specifications that legal professionals can audit directly. When fee schedules change, updates are visible diffs that practitioners can review without programming expertise.
+**Transparency and auditability.** Unlike black-box proprietary calculators, IPFLang scripts are human-readable specifications that can be audited directly. When fee schedules change, updates are visible diffs that can be reviewed without requiring deep programming expertise, though familiarity with the DSL syntax is necessary.
 
-**Formal verification.** Static completeness and monotonicity checking provide guarantees impossible with imperative implementations. Practitioners can be confident that fee definitions cover all cases and behave predictably.
+**Formal verification.** Static completeness checking (exhaustive mode) and monotonicity checking provide formal guarantees impossible with imperative implementations. For domains within the exhaustive threshold, practitioners can be confident that fee definitions cover all cases and behave predictably.
 
 **Vendor independence.** IPFLang-based calculations are vendor-neutral: any conforming interpreter can execute scripts. Multiple tools can compete on user experience while using a standard calculation engine.
 
@@ -986,8 +994,8 @@ Several limitations constrain the current work:
 - **Implementation scope.** The reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows.
 - **Jurisdiction coverage.** The example files demonstrate representative fee structures rather than comprehensive global coverage. Production deployment would require systematic encoding of additional patent office schedules.
 - **Type system expressiveness.** The type system does not support dependent types or refinement types that could express additional invariants (e.g., that claim counts must be positive).
-- **Empirical validation.** User studies validating comprehensibility for legal professionals have not been conducted; accessibility claims are based on design principles rather than empirical evidence.
-- **Sampling completeness.** For large input domains exceeding the exhaustive verification threshold, sampling-based completeness checking may miss gaps between sampled points.
+- **Empirical validation of readability.** User studies validating syntax readability for domain experts have not been conducted; design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16] rather than empirical evidence. This constitutes a significant limitation that future work must address.
+- **Boundary-based testing limitations.** For large input domains exceeding the exhaustive verification threshold (10⁶ combinations), the boundary-based testing mode may miss gaps between sampled points. Users requiring formal completeness guarantees must either constrain domain sizes or employ complementary analysis techniques.
 
 ---
 
@@ -995,19 +1003,19 @@ Several limitations constrain the current work:
 
 This paper introduced IPFLang, a domain-specific language for standardizing intellectual property fee calculations. The key contributions are:
 
-1. **Language specification** with declarative syntax designed for legal professionals with minimal technical training, featuring keyword-based operators (EQ, GT, AND) rather than symbolic notation.
+1. **Language specification** with declarative syntax designed for readability, featuring keyword-based operators (EQ, GT, AND) rather than symbolic notation, explicit block delimiters, and domain-specific primitives for currency and temporal operations.
 
 2. **Currency-aware type system** supporting 161 ISO 4217 currencies with compile-time prevention of cross-currency arithmetic errors, formalized through typing rules with proven soundness properties.
 
-3. **Static verification algorithms** for completeness checking (ensuring all input combinations produce defined outputs with O(∏|Dᵢ|) complexity) and monotonicity verification (ensuring fees behave predictably with respect to numeric inputs).
+3. **Static analysis algorithms** for completeness checking (exhaustive verification for domains ≤10⁶ providing formal guarantees, boundary-based testing for larger domains) and monotonicity verification (ensuring fees behave predictably with respect to numeric inputs).
 
 4. **Provenance tracking** with counterfactual analysis supporting auditability requirements for regulatory compliance and dispute resolution.
 
 5. **Reference implementation** validated through 266 passing tests and verification against official EPO and USPTO fee schedules.
 
-**Impact.** For practitioners, IPFLang offers transparent, verifiable fee calculations with audit trails. For patent offices, the standard provides machine-readable fee schedule specifications enabling third-party tool development. For the research community, IPFLang demonstrates that formal verification techniques can be made accessible in domain-specific contexts.
+**Impact.** For practitioners, IPFLang offers transparent, verifiable fee calculations with audit trails. For patent offices, the standard provides machine-readable fee schedule specifications enabling third-party tool development. For the research community, IPFLang demonstrates that formal verification techniques can be applied to domain-specific regulatory contexts.
 
-**Future work** will address current limitations through: (1) REST API implementation conforming to OpenAPI standards for enterprise integration; (2) expanded jurisdiction coverage through community contributions; (3) cross-domain pilots applying IPFLang patterns to tax calculations and customs duties; (4) formal mechanization of type safety proofs in a proof assistant such as Coq or F*; and (5) user studies with IP practitioners to empirically validate accessibility claims.
+**Future work** will address current limitations through: (1) REST API implementation conforming to OpenAPI standards for enterprise integration; (2) expanded jurisdiction coverage through community contributions; (3) cross-domain pilots applying IPFLang patterns to tax calculations and customs duties; (4) formal mechanization of type safety proofs in a proof assistant such as Coq or F*; and (5) **user studies with IP practitioners to empirically evaluate the readability and usability of the DSL syntax**, addressing the current gap between design-based readability claims and empirical validation.
 
 The open-source implementation is available at https://github.com/vbocan/IPFLang under GPLv3.
 
