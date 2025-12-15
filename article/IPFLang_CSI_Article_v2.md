@@ -732,10 +732,7 @@ The rule T-ADD-AMT is critical: it requires both operands to have identical curr
 
 *Inductive cases:* For T-ADD-AMT, both operands must have type Amt[c] for the same c; the result preserves this currency tag. For T-MUL-SCALAR-R and T-MUL-SCALAR-L, the currency of the Amt operand is preserved regardless of operand order. For T-CONVERT, the explicit conversion changes the currency tag from c₁ to c₂, requiring runtime exchange rate lookup.
 
-The type checker implementation (`CurrencyTypeChecker.cs`) enforces these rules, rejecting programs that violate conditions (1)-(3) before evaluation. Specifically:
-- `InferArithmeticType()` implements T-ADD-AMT, T-MUL-SCALAR-R, and T-MUL-SCALAR-L
-- `InferConvertType()` implements T-CONVERT
-- `TypeError.MixedCurrencyArithmetic()` signals violations of condition (1)
+The type checker implementation (`CurrencyTypeChecker.cs`) enforces these rules, rejecting programs that violate conditions (1)-(3) before evaluation. Specifically, `InferArithmeticType()` implements T-ADD-AMT, T-MUL-SCALAR-R, and T-MUL-SCALAR-L; `InferConvertType()` implements T-CONVERT; and `TypeError.MixedCurrencyArithmetic()` signals violations of condition (1).
 
 **Example - Type Error Detection:**
 ```
@@ -815,15 +812,9 @@ Output: (complete: Bool, gaps: Set⟨InputCombination⟩)
 
 #### 4.2.4 Sampling Strategy
 
-For numeric domains [min, max], the representative sampling selects:
-- Boundary values: min, max
-- Threshold values: integers appearing in conditions (e.g., 15, 50 from `ClaimCount GT 15`)
-- Midpoint: (min + max) / 2
-- Near-boundary: min + 1, max - 1
+For numeric domains [min, max], the representative sampling selects boundary values (min and max), threshold values consisting of integers appearing in conditions (such as 15 and 50 from `ClaimCount GT 15`), the midpoint (min + max) / 2, and near-boundary values (min + 1 and max - 1).
 
-For Boolean domains: both TRUE and FALSE (exhaustive).
-For LIST domains: all choices (exhaustive up to cardinality limit).
-For MULTILIST domains: empty set, singleton sets, full set.
+For Boolean domains, sampling includes both TRUE and FALSE exhaustively. For LIST domains, sampling covers all choices exhaustively up to the cardinality limit. For MULTILIST domains, sampling includes the empty set, all singleton sets, and the full set.
 
 #### 4.2.5 Soundness and Guarantees
 
@@ -893,11 +884,7 @@ Output: (monotonic: Bool, violations: List⟨Violation⟩)
 11: return (violations = [], violations)
 ```
 
-where Violates(p, c, d) returns true iff:
-- d = NonDecreasing and c < p
-- d = NonIncreasing and c > p
-- d = StrictlyIncreasing and c ≤ p
-- d = StrictlyDecreasing and c ≥ p
+where Violates(p, c, d) returns true if and only if: d = NonDecreasing and c < p; d = NonIncreasing and c > p; d = StrictlyIncreasing and c ≤ p; or d = StrictlyDecreasing and c ≥ p.
 
 **Remark (Currency Comparison).** Monotonicity verification compares fee values numerically. When f returns Amt[c], comparison uses the underlying numeric value; currency tags must match (guaranteed by type safety).
 
@@ -913,13 +900,7 @@ VERIFY MONOTONIC FEE DiscountFee WITH RESPECT TO YearsInProgram DIRECTION NonInc
 
 ### 5.1 Execution Tracing
 
-Each fee evaluation generates provenance records documenting:
-
-- Input parameter values used
-- LET variable bindings computed
-- CASE and YIELD conditions evaluated with true/false results
-- The selected YIELD expression and its computed value
-- Final fee amount with currency
+Each fee evaluation generates provenance records that comprehensively document the calculation process. These records capture the input parameter values used, all LET variable bindings computed during evaluation, and each CASE and YIELD condition evaluated along with its true/false result. The trace also records the selected YIELD expression with its computed value and the final fee amount including currency designation.
 
 This trace enables practitioners to verify calculations against official schedules and assists in dispute resolution.
 
@@ -1021,12 +1002,7 @@ Total:             EUR 4,905.00
 
 ### 6.4 Source Code Availability
 
-The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes:
-
-- Complete DSL engine source (~10,000 lines C#)
-- Test suite (~5,500 lines, 266 tests)
-- 20 IPFLang example files (~1,900 lines DSL)
-- Documentation and syntax reference
+The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes the complete DSL engine source (approximately 10,000 lines of C#), a comprehensive test suite (approximately 5,500 lines comprising 266 tests), 20 IPFLang example files (approximately 1,900 lines of DSL code), and documentation with syntax reference.
 
 ---
 
@@ -1034,27 +1010,13 @@ The complete source code is available at https://github.com/vbocan/IPFLang under
 
 ### 7.1 Representative Examples
 
-The implementation includes 20 IPFLang files demonstrating language expressiveness across diverse fee structure patterns:
+The implementation includes 20 IPFLang files demonstrating language expressiveness across diverse fee structure patterns.
 
-**Real-world fee schedules:**
-- EPO filing fees with multi-tiered claim pricing and ISA-dependent search fees
-- USPTO complete fee calculator with entity-based discounts and excess claim calculations
+Real-world fee schedules are represented by EPO filing fees with multi-tiered claim pricing and ISA-dependent search fees, as well as a USPTO complete fee calculator with entity-based discounts and excess claim calculations.
 
-**Feature demonstrations:**
-- Currency type safety with mixed-currency error detection
-- Entity-based discount patterns (50%, 75% reductions)
-- Temporal operations for date-dependent fees
-- Nested CASE blocks for complex conditional logic
-- MULTILIST with !COUNT for designation fees
-- Optional fees and versioning
-- Jurisdiction composition (EPO base + DE/FR/RO national phases)
+Feature demonstrations include currency type safety with mixed-currency error detection, entity-based discount patterns (50% and 75% reductions), temporal operations for date-dependent fees, nested CASE blocks for complex conditional logic, MULTILIST with !COUNT for designation fees, optional fees and versioning, and jurisdiction composition (EPO base combined with DE/FR/RO national phases).
 
-**Error detection examples:**
-- Mixed currency arithmetic (EUR + USD)
-- Incomplete fee coverage
-- Non-monotonic fee behavior
-- Invalid currency codes
-- Undefined variable references
+Error detection examples cover mixed currency arithmetic (EUR + USD), incomplete fee coverage, non-monotonic fee behavior, invalid currency codes, and undefined variable references.
 
 ### 7.2 Validation Against Official Fee Schedules
 
@@ -1156,13 +1118,11 @@ A domain suitability assessment suggests high applicability to professional lice
 
 ### 8.3 Limitations
 
-Several limitations constrain the current work:
+Several limitations constrain the current work. Regarding implementation scope, the reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows. In terms of jurisdiction coverage, the example files demonstrate representative fee structures rather than comprehensive global coverage, and production deployment would require systematic encoding of additional patent office schedules.
 
-- **Implementation scope.** The reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows.
-- **Jurisdiction coverage.** The example files demonstrate representative fee structures rather than comprehensive global coverage. Production deployment would require systematic encoding of additional patent office schedules.
-- **Type system expressiveness.** The type system does not support dependent types or refinement types that could express additional invariants (e.g., that claim counts must be positive).
-- **Empirical validation of readability.** User studies validating syntax readability for domain experts have not been conducted; design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16] rather than empirical evidence. This constitutes a significant limitation that future work must address.
-- **Boundary-based testing limitations.** For large input domains exceeding the exhaustive verification threshold (10⁶ combinations), the boundary-based testing mode may miss gaps between sampled points. Users requiring formal completeness guarantees must either constrain domain sizes or employ complementary analysis techniques.
+The type system expressiveness is constrained in that it does not support dependent types or refinement types that could express additional invariants such as requiring claim counts to be positive. A significant limitation concerns empirical validation of readability: user studies validating syntax readability for domain experts have not been conducted, and design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16] rather than empirical evidence. This constitutes a gap that future work must address.
+
+Finally, boundary-based testing has inherent limitations. For large input domains exceeding the exhaustive verification threshold (10⁶ combinations), the boundary-based testing mode may miss gaps between sampled points. Users requiring formal completeness guarantees must either constrain domain sizes or employ complementary analysis techniques.
 
 ---
 
