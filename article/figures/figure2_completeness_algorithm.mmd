@@ -1,0 +1,40 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4f8', 'primaryTextColor': '#1a1a1a', 'primaryBorderColor': '#4a90a4', 'lineColor': '#4a90a4'}}}%%
+
+flowchart TB
+    Start([Start: CheckCompleteness]) --> Extract[/"Extract domains D<sub>1</sub>...D<sub>n</sub><br/>from input definitions"/]
+    Extract --> CalcSize["Calculate |D| = ∏|D<sub>i</sub>|"]
+    CalcSize --> SizeCheck{"|D| ≤ 10<sup>6</sup>?"}
+
+    SizeCheck -->|Yes| Exhaustive["<b>Exhaustive Mode</b><br/>Generate all combinations"]
+    SizeCheck -->|No| Sampling["<b>Sampling Mode</b><br/>Generate representative values"]
+
+    Exhaustive --> ExLoop[/"For each c ∈ D<sub>1</sub> × ... × D<sub>n</sub>"/]
+    Sampling --> SampLoop[/"For each c ∈ Sample(D<sub>1</sub>) × ... × Sample(D<sub>n</sub>)"/]
+
+    ExLoop --> Evaluate["Evaluate fee F(c)"]
+    SampLoop --> Evaluate
+
+    Evaluate --> CheckOutput{"Output<br/>produced?"}
+    CheckOutput -->|No| RecordGap["Record gap g = (c, context)"]
+    CheckOutput -->|Yes| NextIter["Continue iteration"]
+    RecordGap --> GapLimit{"gaps.count<br/>≥ 100?"}
+    GapLimit -->|Yes| EarlyExit["Early termination<br/>with warning"]
+    GapLimit -->|No| NextIter
+
+    NextIter --> MoreIter{"More<br/>combinations?"}
+    MoreIter -->|Yes| Evaluate
+    MoreIter -->|No| BuildReport["Build CompletenessReport"]
+    EarlyExit --> BuildReport
+
+    BuildReport --> ReturnResult{{"Return:<br/>• isComplete: gaps.empty?<br/>• gaps: List&lt;Gap&gt;<br/>• totalChecked: count<br/>• notes: List&lt;string&gt;"}}
+
+    subgraph legend["Complexity Analysis"]
+        L1["Exhaustive: O(∏|D<sub>i</sub>|)"]
+        L2["Sampling: O(k<sup>n</sup>) where k=5"]
+    end
+
+    style Start fill:#4a90a4,stroke:#2d5a6b,color:#fff
+    style ReturnResult fill:#7cb342,stroke:#558b2f,color:#fff
+    style Exhaustive fill:#e8f4f8,stroke:#4a90a4,stroke-width:2px
+    style Sampling fill:#fff5e6,stroke:#ffa726,stroke-width:2px
+    style legend fill:#f5f5f5,stroke:#999

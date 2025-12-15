@@ -1,0 +1,58 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4f8', 'primaryTextColor': '#1a1a1a', 'primaryBorderColor': '#4a90a4', 'lineColor': '#4a90a4'}}}%%
+
+classDiagram
+    direction TB
+
+    class ProvenanceRecord {
+        +string FeeName
+        +decimal FinalAmount
+        +string Currency
+        +DateTime Timestamp
+        +List~ComponentTrace~ Components
+        +GetAuditTrail() string
+        +ToJson() string
+    }
+
+    class ComponentTrace {
+        +string Label
+        +decimal Amount
+        +string SourceFile
+        +int LineNumber
+        +string Condition
+        +bool ConditionMet
+        +List~InputBinding~ Inputs
+    }
+
+    class InputBinding {
+        +string VariableName
+        +object Value
+        +string SourceType
+    }
+
+    class CounterfactualAnalysis {
+        +ProvenanceRecord Baseline
+        +List~Scenario~ Scenarios
+        +Compare() ComparisonResult
+    }
+
+    class Scenario {
+        +string Name
+        +Dictionary Overrides
+        +ProvenanceRecord Result
+    }
+
+    class ComparisonResult {
+        +decimal Difference
+        +List~string~ AffectedComponents
+        +string Explanation
+    }
+
+    ProvenanceRecord "1" *-- "*" ComponentTrace : contains
+    ComponentTrace "1" *-- "*" InputBinding : uses
+    CounterfactualAnalysis "1" o-- "1" ProvenanceRecord : baseline
+    CounterfactualAnalysis "1" *-- "*" Scenario : compares
+    Scenario "1" --> "1" ProvenanceRecord : produces
+    CounterfactualAnalysis ..> ComparisonResult : generates
+
+    note for ProvenanceRecord "Complete audit trail for<br/>regulatory compliance"
+    note for CounterfactualAnalysis "What-if analysis:<br/>'What if filing date was earlier?'"
