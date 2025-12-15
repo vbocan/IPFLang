@@ -113,6 +113,50 @@ dotnet run --project src/IPFLang.CLI -- info <FILE>
 dotnet run --project src/IPFLang.CLI -- info examples/01_epo_filing.ipf
 ```
 
+#### `compose` - Compose multiple jurisdictions
+
+Composes multiple IPFLang scripts with inheritance. Files are provided in order from root (parent) to leaf (child). Child jurisdictions inherit inputs and fees from parents and can add or override them.
+
+```bash
+dotnet run --project src/IPFLang.CLI -- compose <FILES> [OPTIONS]
+```
+
+**Options:**
+- `--inputs <FILE>` - JSON file containing input values (skips interactive mode)
+- `-p, --provenance` - Show computation provenance (audit trail)
+- `-a, --analysis` - Show inheritance analysis (what is inherited vs. overridden)
+- `-h, --help` - Show help information
+
+**Examples:**
+```bash
+# Compose EPO base with German national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_de.ipf
+
+# Compose EPO base with French national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_fr.ipf
+
+# Compose EPO base with Romanian national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_ro.ipf
+
+# Show inheritance analysis
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_de.ipf --analysis
+
+# With provenance tracking
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_fr.ipf --provenance
+```
+
+**Output (with --analysis):**
+```
+Inheritance Analysis:
+
+jurisdiction_epo_de:
+  Inherited fees: FilingFee, SearchFee, ExaminationFee, ClaimsFee, PageFee, DesignationFee
+  New fees: GermanValidationFee, GermanTranslationFee, GermanAgentFee, GermanPublicationFee
+  Inherited inputs: ApplicationType, ApplicantType, ClaimCount, PageCount
+  New inputs: NeedsTranslation, TranslationPages, UseGermanAgent, TranslationQuality
+  Code reuse: 60.0%
+```
+
 ### Example DSL Script
 
 ```
@@ -218,6 +262,32 @@ The `examples/` directory contains scripts demonstrating all IPFLang features:
 | `08_optional_fees.ipf` | OPTIONAL keyword for fees that may or may not be charged |
 | `09_versioning.ipf` | VERSION directive with effective dates and regulatory references |
 | `10_uspto_complete.ipf` | Complete real-world USPTO fee calculator |
+
+### Jurisdiction Composition Examples
+
+The following examples demonstrate multi-jurisdiction composition with inheritance:
+
+| Example | Description |
+|---------|-------------|
+| `jurisdiction_epo_base.ipf` | Base EPO fee schedule (parent jurisdiction) |
+| `jurisdiction_epo_de.ipf` | German national phase (extends EPO base with translation/agent fees) |
+| `jurisdiction_epo_fr.ipf` | French national phase (extends EPO base with French-specific fees) |
+| `jurisdiction_epo_ro.ipf` | Romanian national phase (extends EPO base with OSIM fees, reduced rates for local applicants) |
+
+**Usage:**
+```bash
+# Compose EPO base with German national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_de.ipf
+
+# Compose EPO base with French national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_fr.ipf
+
+# Compose EPO base with Romanian national phase
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_ro.ipf
+
+# Show what is inherited vs. overridden
+dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_de.ipf --analysis
+```
 
 ### Error Examples
 
