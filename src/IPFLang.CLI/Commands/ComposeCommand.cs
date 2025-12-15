@@ -14,7 +14,7 @@ public class ComposeCommand : Command<ComposeCommand.Settings>
     public class Settings : CommandSettings
     {
         [CommandArgument(0, "<FILES>")]
-        [Description("IPFLang script files in inheritance order (parent first, child last)")]
+        [Description("IPFLang script files in inheritance order (parent first, children last)")]
         public string[] FilePaths { get; set; } = Array.Empty<string>();
 
         [CommandOption("--inputs <FILE>")]
@@ -39,6 +39,7 @@ public class ComposeCommand : Command<ComposeCommand.Settings>
         }
 
         // Validate all files exist
+        var filePaths = new List<string>();
         foreach (var filePath in settings.FilePaths)
         {
             if (!File.Exists(filePath))
@@ -46,7 +47,15 @@ public class ComposeCommand : Command<ComposeCommand.Settings>
                 AnsiConsole.MarkupLine($"[red]Error:[/] File not found: {filePath}");
                 return 1;
             }
+            filePaths.Add(filePath);
         }
+
+        AnsiConsole.MarkupLine($"[dim]Files to compose ({filePaths.Count}):[/]");
+        foreach (var fp in filePaths)
+        {
+            AnsiConsole.MarkupLine($"  [dim]{fp}[/]");
+        }
+        AnsiConsole.WriteLine();
 
         var parser = new DslParser();
         var registry = new JurisdictionRegistry();
@@ -58,9 +67,9 @@ public class ComposeCommand : Command<ComposeCommand.Settings>
         string? previousId = null;
         var jurisdictionIds = new List<string>();
 
-        for (int i = 0; i < settings.FilePaths.Length; i++)
+        for (int i = 0; i < filePaths.Count; i++)
         {
-            var filePath = settings.FilePaths[i];
+            var filePath = filePaths[i];
             var sourceCode = File.ReadAllText(filePath);
             
             var (parsed, errors) = parser.Parse(sourceCode, returnParsedScript: true);
