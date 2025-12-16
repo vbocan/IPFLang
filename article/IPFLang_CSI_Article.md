@@ -1191,7 +1191,7 @@ The open-source implementation is available at https://github.com/vbocan/IPFLang
 
 ## Author Biography
 
-**Valer Bocan, PhD, CSSLP** is a Senior Software Engineer and IP Technology Researcher at Universitatea Politehnica Timisoara, Romania. His research interests include domain-specific languages, legal technology, and software standards. He holds a PhD in Computer Science and has contributed to multiple open-source projects in the IP management ecosystem. Contact: valer.bocan@upt.ro
+**Valer Bocan, PhD, CSSLP** is a lecturer and technology researcher at Politehnica University of Timișoara, Romania. He currently serves as director of the national project "Innovative Systems and Equipment for Implementing Authorized Measures under National Security Mandates”. With a background in software security, he holds a CSSLP (Certified Secure Software Lifecycle Professional) certification from ISC2 and a PhD in Computer Science. His research interests include information security, artificial intelligence, domain-specific languages, legal technology, and software standards. He has contributed to multiple open-source projects, including IPFees (an IP fee management system), QRNG Data Diode (quantum random number generation infrastructure), and Delta Forth (a Forth language implementation for .NET).
 
 ---
 
