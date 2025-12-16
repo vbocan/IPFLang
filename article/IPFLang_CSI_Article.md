@@ -11,7 +11,7 @@ ORCID: 0009-0006-9084-4064
 
 ## Abstract
 
-The intellectual property management industry faces interoperability challenges due to fragmented, proprietary fee calculation implementations across patent offices—no standard exists for encoding or exchanging fee computation rules. This paper presents IPFLang, a domain-specific language specification for multi-jurisdiction fee calculation. IPFLang provides: (1) a formal EBNF grammar with declarative fee computation blocks; (2) a currency-aware type system supporting 161 ISO 4217 currencies that prevents cross-currency arithmetic errors at compile time; (3) static analysis of fee completeness (with formal guarantees for bounded domains) and monotonicity; and (4) provenance tracking for auditability. We present formal typing rules with a type safety argument, analysis algorithms with complexity bounds, and validation against official EPO and USPTO fee schedules. The open-source reference implementation includes 118 production jurisdiction files validated by domain experts, 266 tests, and sub-millisecond execution. IPFLang establishes a foundation for regulatory calculation standardization, enabling vendor-independent fee computation across patent offices.
+The intellectual property management industry faces interoperability challenges due to fragmented, proprietary fee calculation implementations across patent offices—no standard exists for encoding or exchanging fee computation rules. This paper presents IPFLang, a domain-specific language specification for multi-jurisdiction fee calculation. IPFLang provides: (1) a formal EBNF grammar with declarative fee computation blocks; (2) a currency-aware type system supporting 161 ISO 4217 currencies that prevents cross-currency arithmetic errors at compile time; (3) static analysis of fee completeness (with formal guarantees for bounded domains) and monotonicity; and (4) provenance tracking for auditability. We present formal typing rules with a type safety argument, analysis algorithms with complexity bounds, and expert validation of production jurisdiction files. The open-source reference implementation includes 118 production jurisdiction files covering PCT national/regional phase entry fees validated by domain experts, a comprehensive test suite with 260 test methods, and sub-millisecond execution. IPFLang establishes a foundation for regulatory calculation standardization, enabling vendor-independent fee computation across patent offices.
 
 **Keywords:** domain-specific language, intellectual property, standardization, interoperability, type systems, static verification, regulatory automation, formal specification
 
@@ -23,7 +23,7 @@ The intellectual property management industry faces interoperability challenges 
 - Currency-aware type system with 161 ISO 4217 currencies preventing cross-currency errors statically
 - Static analysis of fee completeness (formal guarantees for bounded domains) and monotonicity
 - Provenance tracking with counterfactual analysis for auditability
-- Validation against official EPO and USPTO fee schedules with 118 production jurisdiction files
+- Expert validation of 118 production jurisdiction files covering PCT national/regional phase entry fees
 - Open-source reference implementation enabling vendor-independent fee computation
 
 ---
@@ -62,13 +62,13 @@ This paper presents IPFLang (Intellectual Property Fees Language), a domain-spec
 
 3. **Provenance and Auditability** (Section 5): Execution tracing showing how final amounts derive from input parameters, with counterfactual analysis enabling what-if scenarios for regulatory compliance.
 
-4. **Reference Implementation** (Section 6): An open-source command-line tool released under GPLv3 demonstrating IPFLang execution with 266 tests validating type safety and verification correctness.
+4. **Reference Implementation** (Section 6): An open-source command-line tool released under GPLv3 demonstrating IPFLang execution with 260 test methods validating type safety and verification correctness.
 
-5. **Validation** (Section 7): Systematic validation against official EPO and USPTO fee schedules demonstrating calculation accuracy.
+5. **Validation** (Section 7): Expert validation of 118 production jurisdiction files covering PCT national/regional phase entry fees for major patent offices worldwide.
 
 ### 1.4 Paper Organization
 
-Section 2 surveys related work in IP data standards, legal domain DSLs, and regulatory automation. Section 3 presents the complete IPFLang specification including formal grammar and input type system. Section 4 details the currency-aware type system with formal typing rules and static verification algorithms. Section 5 describes provenance tracking and counterfactual analysis. Section 6 presents the reference implementation architecture. Section 7 provides evaluation including validation against official fee schedules and threats to validity. Section 8 discusses advantages of DSL-based standardization, cross-domain applicability, and limitations. Section 9 concludes with contributions summary, impact assessment, and future directions.
+Section 2 surveys related work in IP data standards, legal domain DSLs, and regulatory automation. Section 3 presents the complete IPFLang specification including formal grammar and input type system. Section 4 details the currency-aware type system with formal typing rules and static verification algorithms. Section 5 describes provenance tracking and counterfactual analysis. Section 6 presents the reference implementation architecture. Section 7 provides evaluation including expert validation of production jurisdiction files and threats to validity. Section 8 discusses advantages of DSL-based standardization, cross-domain applicability, and limitations. Section 9 concludes with contributions summary, impact assessment, and future directions.
 
 ---
 
@@ -1003,7 +1003,7 @@ Total:             EUR 4,905.00
 
 ### 6.4 Source Code Availability
 
-The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes the complete DSL engine source (approximately 10,000 lines of C#), a comprehensive test suite (approximately 5,500 lines comprising 266 tests), 20 IPFLang example files (approximately 1,900 lines of DSL code), and documentation with syntax reference.
+The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes the complete DSL engine source (approximately 10,000 lines of C#), a comprehensive test suite (approximately 5,500 lines comprising 260 test methods across 18 test categories), 20 IPFLang example files in the `examples/` directory (approximately 1,900 lines of DSL code) demonstrating language features, 118 production jurisdiction files in the `jurisdictions/` directory covering PCT national/regional phase entry fees (approximately 11,800 lines of DSL code), and documentation with syntax reference.
 
 ---
 
@@ -1011,7 +1011,7 @@ The complete source code is available at https://github.com/vbocan/IPFLang under
 
 ### 7.1 Representative Examples
 
-The implementation includes 20 IPFLang example files in the `examples/` directory demonstrating language expressiveness across diverse fee structure patterns, plus **118 production-ready jurisdiction files** in the `jurisdictions/` directory covering PCT national/regional phase entry fees for all major patent offices.
+The implementation includes 20 IPFLang example files in the `examples/` directory demonstrating language expressiveness across diverse fee structure patterns, plus **118 production-ready jurisdiction files** in the `jurisdictions/` directory covering PCT national/regional phase entry fees for all major patent offices worldwide.
 
 Real-world fee schedules are represented by EPO filing fees with multi-tiered claim pricing and ISA-dependent search fees, as well as a USPTO complete fee calculator with entity-based discounts and excess claim calculations.
 
@@ -1021,51 +1021,23 @@ Error detection examples cover mixed currency arithmetic (EUR + USD), incomplete
 
 The 118 production jurisdictions (validated by a domain expert against official PCT fee schedules) are organized hierarchically: 4 regional base files (EP, EA, AP, OA) defining common fee structures for European Patent, Eurasian Patent, ARIPO, and OAPI member states, and 118 jurisdiction-specific files (`PCT-XX.ipf` where XX is the ISO country code) that either stand alone or inherit from and extend their regional base. For example, `PCT-RO.ipf` (Romania) composes with `bases/base_ep.ipf` to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication across jurisdictions sharing common regional structures while allowing country-specific customizations.
 
-### 7.2 Validation Against Official Fee Schedules
+### 7.2 Jurisdiction File Validation
 
-We validated IPFLang calculations against official fee schedules from the EPO [2] and USPTO [1].
+The 118 production jurisdiction files in the `jurisdictions/` directory were validated by a domain expert (Robert Fichter, Ph.D., Jet IP) against official PCT national/regional phase entry fee schedules from patent offices worldwide. The validation process verified dollar-accurate calculations across all supported jurisdictions covering the period 2023-2024.
 
-#### 7.2.1 EPO Validation (April 2024 Schedule)
+The jurisdiction files are organized hierarchically with 4 regional base files defining common fee structures:
+- **base_ep.ipf**: European Patent Convention member states (38 countries)
+- **base_ea.ipf**: Eurasian Patent Organization member states (9 countries)  
+- **base_ap.ipf**: African Regional Intellectual Property Organization (ARIPO) member states (19 countries)
+- **base_oa.ipf**: African Intellectual Property Organization (OAPI) member states (17 countries)
 
-Table 2 presents validation results for the EPO filing fee calculator against the official EPO fee schedule effective April 1, 2024.
+Individual jurisdiction files (`PCT-XX.ipf` where XX is the ISO country code) either stand alone or inherit from and extend their regional base using the COMPOSE directive. For example, `PCT-RO.ipf` (Romania) composes with `bases/base_ep.ipf` to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication while allowing country-specific customizations.
 
-| Test Case | Claims | Pages | ISA | Expected (EUR) | IPFLang (EUR) | Match |
-|-----------|--------|-------|-----|----------------|---------------|-------|
-| E1: Base filing | 10 | 30 | None | 2,255 | 2,255 | ✓ |
-| E2: Excess claims (16-50) | 25 | 30 | None | 4,905 | 4,905 | ✓ |
-| E3: Excess claims (>50) | 60 | 30 | None | 14,125 | 14,125 | ✓ |
-| E4: Excess pages | 10 | 50 | None | 2,510 | 2,510 | ✓ |
-| E5: EPO as ISA | 10 | 30 | EPO | 795 | 795 | ✓ |
-| E6: Other ISA | 10 | 30 | Other | 1,070 | 1,070 | ✓ |
-
-*Table 2: EPO Validation Results (Filing Fee = €135, Designation = €660, Search = €1,460, Claim Fee = €265/€660, Page Fee = €17)*
-
-**Methodology:** Expected values were computed manually from the official EPO Schedule of Fees [2]. The IPFLang script encodes fees effective April 1, 2024.
-
-#### 7.2.2 USPTO Validation (January 2025 Schedule)
-
-Table 3 presents validation results for the USPTO fee calculator against the official fee schedule effective January 19, 2025.
-
-| Test Case | Entity | App Type | Claims | Indep | Expected (USD) | IPFLang (USD) | Match |
-|-----------|--------|----------|--------|-------|----------------|---------------|-------|
-| U1: Large utility | Large | Utility | 20 | 3 | 2,000 | 2,000 | ✓ |
-| U2: Small utility | Small | Utility | 20 | 3 | 800 | 800 | ✓ |
-| U3: Micro utility | Micro | Utility | 20 | 3 | 400 | 400 | ✓ |
-| U4: Excess claims | Large | Utility | 30 | 3 | 3,000 | 3,000 | ✓ |
-| U5: Excess indep | Large | Utility | 20 | 5 | 2,960 | 2,960 | ✓ |
-| U6: Design | Large | Design | - | - | 1,240 | 1,240 | ✓ |
-| U7: Provisional | Large | Provisional | - | - | 350 | 350 | ✓ |
-| U8: Paper surcharge | Large | Utility | 20 | 3 | 2,400 | 2,400 | ✓ |
-
-*Table 3: USPTO Validation Results (2025 Fee Schedule: Filing+Search+Exam = $2,000 large, 60% small discount, 80% micro discount)*
-
-**Methodology:** Expected values were computed from the USPTO fee schedule [1] effective January 19, 2025. The IPFLang script reflects the updated entity discount structure (60% small, 80% micro).
-
-All 14 representative test scenarios covering the major fee calculation patterns (base fees, excess claims at multiple tiers, entity discounts, application types, and surcharges) produced exact matches with official calculations, demonstrating IPFLang's accuracy for production fee calculations.
+The test suite includes `RealWorldValidationTests.cs` with synthetic USPTO and EPO fee schedule models demonstrating the language's capability to represent complex, multi-tiered fee structures with entity-based discounts, excess claim calculations, and temporal versioning. These tests validate the DSL engine's computational correctness but use representative fee values rather than exact current schedules, as official fee schedules are updated annually and vary by jurisdiction.
 
 ### 7.3 Test Suite
 
-The test suite comprises 266 tests across 18 test files covering:
+The test suite comprises 260 test methods across 18 test categories covering:
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
@@ -1079,13 +1051,13 @@ The test suite comprises 266 tests across 18 test files covering:
 | Versioning | 21 | Diff, impact analysis |
 | Other | 77 | Semantics, parsing, logic |
 
-All 266 tests pass with 100% success rate. Test execution completes in approximately 75ms (0.28ms average per test), confirming that DSL interpretation imposes negligible overhead.
+All 260 tests pass with 100% success rate. Test execution completes in sub-millisecond time per test, confirming that DSL interpretation imposes negligible overhead.
 
 ### 7.4 Threats to Validity
 
 **Internal Validity.** The test suite validates correctness of the implementation but may not cover all edge cases. The 266 tests focus on feature coverage rather than exhaustive input space exploration. The validation against official fee schedules covers representative scenarios but not all possible input combinations.
 
-**External Validity.** The 20 example files in `examples/` demonstrate language expressiveness, complemented by 118 production jurisdiction files in `jurisdictions/` covering PCT national/regional phase entry for major patent offices. These production files were validated by a domain expert against official PCT fee schedules. The EPO and USPTO examples presented in Section 7.2 were selected for detailed presentation due to their fee structure complexity and public availability of official schedules, but all 118 jurisdictions have undergone expert validation.
+**External Validity.** The 118 production jurisdiction files in `jurisdictions/` covering PCT national/regional phase entry for major patent offices were validated by a domain expert (Robert Fichter, Ph.D.) against official PCT fee schedules. The validation confirmed dollar-accurate calculations across all supported jurisdictions. The test suite includes synthetic fee schedule models for USPTO and EPO that demonstrate the language's expressiveness for complex fee structures, though these use representative values rather than tracking current official schedules which are updated annually.
 
 **Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
 
