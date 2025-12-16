@@ -289,6 +289,56 @@ dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.i
 dotnet run --project src/IPFLang.CLI -- compose examples/jurisdiction_epo_base.ipf examples/jurisdiction_epo_de.ipf --analysis
 ```
 
+## Production Jurisdictions
+
+The `jurisdictions/` directory contains **118 production-ready PCT national/regional phase fee schedules** organized by patent office, along with 4 base fee schedules for regional patent systems:
+
+### Regional Bases
+
+| Base File | Regional System | Member States |
+|-----------|----------------|---------------|
+| `bases/base_ep.ipf` | European Patent Office (EP) | AL, AT, BA, BE, BG, CH, CY, CZ, DE, DK, EE, ES, FI, FR, GB, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MC, MK, MT, NL, NO, PL, PT, RO, RS, SE, SI, SK, SM, TR |
+| `bases/base_ea.ipf` | Eurasian Patent Organization (EA) | AM, AZ, BY, KG, KZ, MD, RU, TJ, TM |
+| `bases/base_ap.ipf` | ARIPO (African Regional IP Organization) (AP) | BW, GH, GM, KE, LR, LS, MW, MZ, NA, SC, SD, TZ, UG, ZM, ZW |
+| `bases/base_oa.ipf` | OAPI (African Intellectual Property Organization) (OA) | BF, BJ, CF, CG, CI, CM, GA, GN, GQ, GW, ML, MR, NE, SN, TD, TG |
+
+### Jurisdiction Files
+
+All 118 jurisdictions are available as `PCT-{CODE}.ipf` files where `{CODE}` is the two-letter ISO country code. Each jurisdiction can be:
+
+**Run standalone** (for jurisdictions without a base):
+```bash
+cd jurisdictions
+dotnet run --project ../src/IPFLang.CLI -- run ./PCT-US.ipf
+```
+
+**Composed with their regional base** (for EP, EA, AP, OA members):
+```bash
+cd jurisdictions
+# European Patent - Romania
+dotnet run --project ../src/IPFLang.CLI -- run compose ./bases/base_ep.ipf ./PCT-RO.ipf
+
+# Eurasian Patent - Russia  
+dotnet run --project ../src/IPFLang.CLI -- compose ./bases/base_ea.ipf ./PCT-RU.ipf
+
+# ARIPO - Kenya
+dotnet run --project ../src/IPFLang.CLI -- compose ./bases/base_ap.ipf ./PCT-KE.ipf
+```
+
+**Compose multiple jurisdictions** for cost comparison:
+```bash
+cd jurisdictions
+# Compare costs for Germany, France, and Romania
+dotnet run --project ../src/IPFLang.CLI -- compose ./bases/base_ep.ipf ./PCT-DE.ipf ./PCT-FR.ipf ./PCT-RO.ipf
+```
+
+Each jurisdiction file includes metadata in its header showing:
+- Category (OfficialFees)
+- Currency (EUR, USD, etc.)
+- Phase (National Phase, Regional Phase)
+- Whether it inherits from a base
+- Usage example with correct command
+
 ### Error Examples
 
 The `examples/errors/` directory contains scripts that **intentionally fail** to demonstrate the DSL's validation capabilities:
