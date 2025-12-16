@@ -1,0 +1,39 @@
+**[Date]**
+
+**Valer Bocan, PhD, CSSLP**
+Department of Computer and Information Technology
+Politehnica University Timisoara
+Timisoara, 300223, Romania
+valer.bocan@upt.ro
+
+**To the Editor-in-Chief**
+*Computer Standards & Interfaces*
+Elsevier
+
+**Subject: Submission of original research article: "IPFLang: A Domain-Specific Language with Static Verification for Multi-Jurisdiction Intellectual Property Fee Calculation"**
+
+Dear Editor,
+
+I am pleased to submit the enclosed manuscript entitled **"IPFLang: A Domain-Specific Language with Static Verification for Multi-Jurisdiction Intellectual Property Fee Calculation"** for consideration for publication in *Computer Standards & Interfaces*.
+
+The global intellectual property (IP) management ecosystem currently suffers from a significant "specification gap." While data exchange standards like WIPO ST.96 exist for bibliographic data, there is no standard for the computational logic of fee calculation. This forces patent offices to rely on fragmented, proprietary web calculators lacking programmatic interfaces, resulting in interoperability issues and high error rates in cross-border filings.
+
+This paper addresses this standardization challenge by introducing IPFLang, a domain-specific language that provides a standard specification for jurisdiction-specific fee rules. We believe this work is highly relevant to *Computer Standards & Interfaces* as it presents a novel application of formal methods to solve a regulatory interoperability problem.
+
+Key contributions of this work include:
+
+* **Formal Standardization:** A complete EBNF grammar and language specification designed to serve as a standard interchange format for fee calculation rules across different jurisdictions.
+* **Currency-Aware Type System:** A dimensional type system supporting 161 ISO 4217 currencies that prevents cross-currency arithmetic errors (e.g., adding EUR to USD) at compile time, ensuring financial accuracy in software interfaces.
+* **Static Verification Algorithms:** The detailed presentation of algorithms for verifying fee completeness (identifying gaps in input coverage) and monotonicity, providing formal correctness guarantees for bounded domains.
+* **Practical Validation:** We provide a reference implementation (released as open-source) and validate the language against complex, official fee schedules from the European Patent Office (EPO) and the United States Patent and Trademark Office (USPTO).
+
+This research sits at the intersection of software engineering, formal language design, and legal informatics. It demonstrates how domain-specific standards can replace proprietary "black box" implementations to achieve transparency and interoperability in government-to-business interfaces.
+
+I confirm that this manuscript is original, has not been published elsewhere, and is not currently under consideration by another journal. I have no conflicts of interest to declare.
+
+Thank you for your time and consideration of this work.
+
+Sincerely,
+
+**Valer Bocan, PhD, CSSLP**
+Politehnica University Timisoara
