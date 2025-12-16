@@ -562,5 +562,98 @@ namespace IPFLang.Engine.Tests
         }
 
         #endregion
+
+        #region Temporal Property Type Inference Tests
+
+        [Fact]
+        public void TestTypeCheckerTemporalPropertyWithRound()
+        {
+            string text =
+            """
+            DEFINE DATE ApplicationDate AS 'Application date'
+            BETWEEN 01.01.2000 AND TODAY
+            DEFAULT 01.01.2020
+            ENDDEFINE
+
+            COMPUTE FEE RenewalFee
+            LET RenMonth AS ROUND ( ApplicationDate!MONTHSTONOW )
+            CASE RenMonth GTE 12 AS
+              YIELD 100
+            ENDCASE
+            CASE RenMonth LT 12 AS
+              YIELD 50
+            ENDCASE
+            ENDCOMPUTE
+            """;
+            var p = new DslParser();
+            p.Parse(text);
+
+            var checker = new CurrencyTypeChecker();
+            var errors = checker.Check(p.GetInputs(), p.GetFees()).ToList();
+            Assert.Empty(errors); // Should have no type errors
+        }
+
+        [Fact]
+        public void TestTypeCheckerTemporalPropertyYearsToNow()
+        {
+            string text =
+            """
+            DEFINE DATE FilingDate AS 'Filing date'
+            BETWEEN 01.01.2000 AND TODAY
+            DEFAULT 01.01.2020
+            ENDDEFINE
+
+            COMPUTE FEE AnnuityFee
+            LET Years AS FLOOR ( FilingDate!YEARSTONOW )
+            CASE Years GTE 5 AS
+              YIELD 200
+            ENDCASE
+            CASE Years LT 5 AS
+              YIELD 100
+            ENDCASE
+            ENDCOMPUTE
+            """;
+            var p = new DslParser();
+            p.Parse(text);
+
+            var checker = new CurrencyTypeChecker();
+            var errors = checker.Check(p.GetInputs(), p.GetFees()).ToList();
+            Assert.Empty(errors);
+        }
+
+        [Fact]
+        public void TestTypeCheckerMultilistCountProperty()
+        {
+            string text =
+            """
+            DEFINE MULTILIST Claims AS 'Selected claims'
+            CHOICE Claim1 AS 'Claim 1'
+            CHOICE Claim2 AS 'Claim 2'
+            CHOICE Claim3 AS 'Claim 3'
+            DEFAULT Claim1
+            ENDDEFINE
+
+            COMPUTE FEE ClaimFee
+            LET ClaimCount AS Claims!COUNT
+            CASE ClaimCount GT 5 AS
+              YIELD ClaimCount * 50
+            ENDCASE
+            CASE ClaimCount LTE 5 AS
+              YIELD ClaimCount * 100
+            ENDCASE
+            ENDCOMPUTE
+
+            VERIFY COMPLETE FEE ClaimFee
+            """;
+            var p = new DslParser();
+            var parseResult = p.Parse(text);
+            Assert.True(parseResult); // Make sure parse succeeded
+
+            var checker = new CurrencyTypeChecker();
+            var errors = checker.Check(p.GetInputs(), p.GetFees()).ToList();
+            Assert.Empty(errors);
+        }
+
+        #endregion
     }
 }

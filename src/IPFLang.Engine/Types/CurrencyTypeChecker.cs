@@ -372,6 +372,38 @@ namespace IPFLang.Types
                 return new IPFTypeBoolean();
             }
 
+            // Temporal property access: Date!MONTHSTONOW, Date!YEARSTONOW, Date!DAYSTONOW, Date!MONTHSTONOW_FROMLASTDAY
+            if (token.Contains("!"))
+            {
+                var parts = token.Split('!');
+                if (parts.Length == 2)
+                {
+                    var varName = parts[0];
+                    var property = parts[1];
+
+                    var baseType = env.Lookup(varName);
+                    if (baseType != null)
+                    {
+                        // Check temporal properties on DATE types
+                        if (baseType is IPFTypeDate &&
+                            (property.Equals("MONTHSTONOW", StringComparison.OrdinalIgnoreCase) ||
+                             property.Equals("YEARSTONOW", StringComparison.OrdinalIgnoreCase) ||
+                             property.Equals("DAYSTONOW", StringComparison.OrdinalIgnoreCase) ||
+                             property.Equals("MONTHSTONOW_FROMLASTDAY", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            return new IPFTypeNumber();
+                        }
+
+                        // Check !COUNT property on MULTILIST types
+                        if (baseType is IPFTypeStringList &&
+                            property.Equals("COUNT", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return new IPFTypeNumber();
+                        }
+                    }
+                }
+            }
+
             // Variable lookup
             var varType = env.Lookup(token);
             if (varType != null)
