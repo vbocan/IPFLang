@@ -1010,13 +1010,15 @@ The complete source code is available at https://github.com/vbocan/IPFLang under
 
 ### 7.1 Representative Examples
 
-The implementation includes 20 IPFLang files demonstrating language expressiveness across diverse fee structure patterns.
+The implementation includes 20 IPFLang example files in the `examples/` directory demonstrating language expressiveness across diverse fee structure patterns, plus **118 production-ready jurisdiction files** in the `jurisdictions/` directory covering PCT national/regional phase entry fees for all major patent offices.
 
 Real-world fee schedules are represented by EPO filing fees with multi-tiered claim pricing and ISA-dependent search fees, as well as a USPTO complete fee calculator with entity-based discounts and excess claim calculations.
 
 Feature demonstrations include currency type safety with mixed-currency error detection, entity-based discount patterns (50% and 75% reductions), temporal operations for date-dependent fees, nested CASE blocks for complex conditional logic, MULTILIST with !COUNT for designation fees, optional fees and versioning, and jurisdiction composition (EPO base combined with DE/FR/RO national phases).
 
 Error detection examples cover mixed currency arithmetic (EUR + USD), incomplete fee coverage, non-monotonic fee behavior, invalid currency codes, and undefined variable references.
+
+The 118 production jurisdictions (validated by a domain expert against official PCT fee schedules) are organized hierarchically: 4 regional base files (EP, EA, AP, OA) defining common fee structures for European Patent, Eurasian Patent, ARIPO, and OAPI member states, and 118 jurisdiction-specific files (`PCT-XX.ipf` where XX is the ISO country code) that either stand alone or inherit from and extend their regional base. For example, `PCT-RO.ipf` (Romania) composes with `bases/base_ep.ipf` to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication across jurisdictions sharing common regional structures while allowing country-specific customizations.
 
 ### 7.2 Validation Against Official Fee Schedules
 
@@ -1082,7 +1084,7 @@ All 266 tests pass with 100% success rate. Test execution completes in approxima
 
 **Internal Validity.** The test suite validates correctness of the implementation but may not cover all edge cases. The 266 tests focus on feature coverage rather than exhaustive input space exploration. The validation against official fee schedules covers representative scenarios but not all possible input combinations.
 
-**External Validity.** The 20 example files demonstrate language expressiveness but do not constitute production-scale jurisdiction coverage. The EPO and USPTO examples were selected for their fee structure complexity and public availability of official schedules. Generalization to all 118+ patent offices requires additional implementation effort.
+**External Validity.** The 20 example files in `examples/` demonstrate language expressiveness, complemented by 118 production jurisdiction files in `jurisdictions/` covering PCT national/regional phase entry for major patent offices. These production files were validated by a domain expert against official PCT fee schedules. The EPO and USPTO examples presented in Section 7.2 were selected for detailed presentation due to their fee structure complexity and public availability of official schedules, but all 118 jurisdictions have undergone expert validation.
 
 **Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
 
@@ -1118,7 +1120,7 @@ A domain suitability assessment suggests high applicability to professional lice
 
 ### 8.3 Limitations
 
-Several limitations constrain the current work. Regarding implementation scope, the reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows. In terms of jurisdiction coverage, the example files demonstrate representative fee structures rather than comprehensive global coverage, and production deployment would require systematic encoding of additional patent office schedules.
+Several limitations constrain the current work. Regarding implementation scope, the reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows. In terms of jurisdiction coverage, while the repository includes 118 production jurisdiction files covering PCT national/regional phase entry for major patent offices (validated by a domain expert against official PCT fee schedules), extension to cover additional fee types (annuities, oppositions, appeals) remains important future work.
 
 The type system expressiveness is constrained in that it does not support dependent types or refinement types that could express additional invariants such as requiring claim counts to be positive. A significant limitation concerns empirical validation of readability: user studies validating syntax readability for domain experts have not been conducted, and design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16] rather than empirical evidence. This constitutes a gap that future work must address.
 

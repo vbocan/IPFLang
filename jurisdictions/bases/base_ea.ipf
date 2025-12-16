@@ -6,8 +6,6 @@
 #
 # Member States: AM, AZ, BY, KG, KZ, MD, RU, TJ, TM
 #
-# Usage:
-#   dotnet run --project src/IPFLang.CLI -- compose bases/base_ea.ipf jurisdictions/PCT-XX.ipf
 #
 # =============================================================================
 

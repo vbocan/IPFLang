@@ -4,10 +4,8 @@
 # This is a BASE file for EP member jurisdictions.
 # Child jurisdictions inherit these definitions and can override specific fees.
 #
-# Member States: AL, AT, BA, BE, BG, CH, CY, CZ, DE, DK...
+# Member States: AL, AT, BA, BE, BG, CH, CY, CZ, DE, DK, EE, ES, FI, FR, GB, GR, HR, HU, IE, IS, IT, LI, LT, LU, LV, MC, MK, MT, NL, NO, PL, PT, RO, RS, SE, SI, SK, SM, TR
 #
-# Usage:
-#   dotnet run --project src/IPFLang.CLI -- compose bases/base_ep.ipf jurisdictions/PCT-XX.ipf
 #
 # =============================================================================
 

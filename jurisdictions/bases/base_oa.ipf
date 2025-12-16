@@ -6,8 +6,6 @@
 #
 # Member States: BF, BJ, CF, CG, CI, CM, GA, GN, GQ, GW...
 #
-# Usage:
-#   dotnet run --project src/IPFLang.CLI -- compose bases/base_oa.ipf jurisdictions/PCT-XX.ipf
 #
 # =============================================================================
 

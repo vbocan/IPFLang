@@ -6,8 +6,6 @@
 #
 # Member States: BW, CV, GH, GM, KE, LR, LS, MW, MZ, NA...
 #
-# Usage:
-#   dotnet run --project src/IPFLang.CLI -- compose bases/base_ap.ipf jurisdictions/PCT-XX.ipf
 #
 # =============================================================================
 
