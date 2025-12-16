@@ -140,7 +140,7 @@ public class RunCommand : Command<RunCommand.Settings>
 
                 case DslInputDate dateInput:
                     var dateStr = AnsiConsole.Ask(
-                        $"[cyan]{input.Name}[/] ({input.Text}) [yyyy-MM-dd]:",
+                        $"[cyan]{input.Name}[/] ({input.Text}) [[yyyy-MM-dd]]:",
                         dateInput.DefaultValue.ToString("yyyy-MM-dd"));
                     if (DateOnly.TryParse(dateStr, out var dateValue))
                         values.Add(new IPFValueDate(input.Name, dateValue));
