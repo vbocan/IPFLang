@@ -1,211 +1,696 @@
-# IPFLang Syntax Reference
+# IPFLang Syntax Manual
 
-IPFLang is a domain-specific language for defining intellectual property fee calculations with advanced features for currency handling, completeness verification, provenance tracking, and version management. This document provides a complete syntax reference for IP practitioners and developers.
+Welcome to IPFLang, a domain-specific language designed specifically for expressing intellectual property fee calculations. Whether you're an IP practitioner creating fee schedules or a developer integrating fee logic into larger systems, this manual will guide you through the language's syntax and capabilities.
 
-**Key Features:**
-- Currency-aware type system with compile-time validation
-- Static completeness and monotonicity verification
-- Provenance tracking with counterfactual analysis
-- Version management with effective dates and regulatory references
+IPFLang brings precision and clarity to the complex world of IP fees. It features a currency-aware type system that prevents mixing currencies accidentally, static verification to ensure your fee schedules cover all cases, and powerful temporal operations for handling deadlines and renewals. The language is designed to read almost like natural language while maintaining the rigor needed for accurate financial calculations.
 
 ---
 
 ## Table of Contents
 
-1. [Basic Concepts](#basic-concepts)
-2. [CLI Usage](#cli-usage)
+1. [Core Concepts](#core-concepts)
+2. [Writing Your First Script](#writing-your-first-script)
 3. [Comments](#comments)
-4. [Version Declaration](#version-declaration) *(versioning)*
+4. [Version Declaration](#version-declaration)
 5. [Input Definitions](#input-definitions)
    - [LIST](#list-input)
    - [MULTILIST](#multilist-input)
    - [NUMBER](#number-input)
    - [BOOLEAN](#boolean-input)
    - [DATE](#date-input)
-   - [AMOUNT](#amount-input) *(currency-aware)*
-6. [Groups](#groups)
+   - [AMOUNT](#amount-input)
+6. [Organizing with Groups](#organizing-with-groups)
 7. [Fee Computations](#fee-computations)
    - [Basic Fees](#basic-fees)
    - [Optional Fees](#optional-fees)
    - [Cases and Conditions](#cases-and-conditions)
    - [Local Variables (LET)](#local-variables)
-   - [Polymorphic Fees](#polymorphic-fees) *(currency-aware)*
+   - [Polymorphic Fees](#polymorphic-fees)
 8. [Expressions](#expressions)
    - [Arithmetic](#arithmetic-operators)
    - [Comparisons](#comparison-operators)
    - [Logical](#logical-operators)
    - [Built-in Functions](#built-in-functions)
-   - [Currency Literals](#currency-literals) *(currency-aware)*
-   - [Currency Conversion](#currency-conversion) *(currency-aware)*
+   - [Currency Literals](#currency-literals)
+   - [Currency Conversion](#currency-conversion)
 9. [Returns](#returns)
-10. [Verification Directives](#verification-directives) *(completeness checking)*
+10. [Verification Directives](#verification-directives)
     - [VERIFY COMPLETE](#verify-complete)
     - [VERIFY MONOTONIC](#verify-monotonic)
-11. [Temporal Operations](#temporal-operations)
-12. [Jurisdiction Composition](#jurisdiction-composition)
-13. [Complete Example](#complete-example)
+11. [Advanced Features](#advanced-features)
+    - [Temporal Operations](#temporal-operations)
+    - [Jurisdiction Composition](#jurisdiction-composition)
+12. [Complete Example](#complete-example)
 
 ---
 
-## Basic Concepts
+## Core Concepts
 
-IPFLang scripts define:
-- **Versions**: Optional metadata for tracking fee schedule changes over time
-- **Inputs**: Variables that users provide (entity type, claim count, dates, fees)
-- **Fees**: Computed amounts based on input values
-- **Returns**: Named outputs from the calculation
-- **Verification**: Static analysis directives for completeness and monotonicity
+At its heart, an IPFLang script is a recipe for calculating fees. You begin by declaring what information you need from the user—these are your **inputs**. Perhaps you need to know the entity type (large, small, or micro), the number of claims in a patent application, or whether examination is requested.
 
-The calculator processes inputs through fee definitions and produces totals, with support for:
-- **Currency-aware type checking**: Prevents accidental cross-currency arithmetic
-- **Completeness verification**: Ensures all input combinations are covered
-- **Provenance tracking**: Records which rules contributed to each fee
-- **Version management**: Tracks fee schedule changes with effective dates
-- **Temporal logic**: Business day calculations, deadline tracking, and time-based fees
+Next, you define **fees** that compute monetary amounts based on those inputs. A filing fee might be $500 for small entities and $1000 for large entities. An excess claims fee might charge $50 for each claim beyond the first 20.
 
----
+Finally, you specify what **returns** to report back—typically totals of mandatory fees, optional fees, and grand totals.
 
-## CLI Usage
+What makes IPFLang special are its advanced features:
 
-The IPFLang CLI provides commands for parsing, running, verifying, and inspecting scripts.
+**Currency-Aware Type System**: The language prevents you from accidentally adding euros to dollars. Each monetary value carries its currency, and the type system enforces consistency at compile time.
 
-### Commands
+**Completeness Verification**: You can ask IPFLang to verify that your fee definitions cover every possible combination of inputs. No more discovering gaps in production.
 
-#### `parse` - Parse and validate a script
+**Provenance Tracking**: The system records exactly which rules contributed to each fee, creating an audit trail for transparency and compliance.
 
-Parses the IPFLang script and reports any syntax or type errors.
-
-```bash
-dotnet run --project src/IPFLang.CLI -- parse <FILE>
-```
-
-**Example:**
-```bash
-dotnet run --project src/IPFLang.CLI -- parse examples/01_epo_filing.ipf
-```
-
-#### `run` - Execute a script
-
-Executes the script with input values. By default, prompts interactively for each input.
-
-```bash
-dotnet run --project src/IPFLang.CLI -- run <FILE> [OPTIONS]
-```
-
-**Options:**
-| Option | Description |
-|--------|-------------|
-| `--inputs <FILE>` | JSON file containing input values (skips interactive mode) |
-| `-p, --provenance` | Show computation provenance (audit trail) |
-| `-c, --counterfactuals` | Show counterfactual analysis (what-if scenarios) |
-
-**Examples:**
-```bash
-# Interactive mode (default)
-dotnet run --project src/IPFLang.CLI -- run examples/01_epo_filing.ipf
-
-# With inputs from JSON file
-dotnet run --project src/IPFLang.CLI -- run examples/01_epo_filing.ipf --inputs inputs.json
-
-# Show computation audit trail
-dotnet run --project src/IPFLang.CLI -- run examples/01_epo_filing.ipf --provenance
-
-# Show what-if analysis
-dotnet run --project src/IPFLang.CLI -- run examples/01_epo_filing.ipf --counterfactuals
-```
-
-#### `verify` - Run verification checks
-
-Runs completeness and monotonicity verification on all fees with VERIFY directives.
-
-```bash
-dotnet run --project src/IPFLang.CLI -- verify <FILE>
-```
-
-**Example:**
-```bash
-dotnet run --project src/IPFLang.CLI -- verify examples/05_verification.ipf
-```
-
-#### `info` - Display script information
-
-Shows detailed information about a script including inputs, fees, groups, and version metadata.
-
-```bash
-dotnet run --project src/IPFLang.CLI -- info <FILE>
-```
-
-**Example:**
-```bash
-dotnet run --project src/IPFLang.CLI -- info examples/01_epo_filing.ipf
-```
-
-### Input JSON Format
-
-When using `--inputs`, provide a JSON file with input values:
-
-```json
-{
-  "EntityType": "SmallEntity",
-  "ClaimCount": 25,
-  "RequestsExamination": true,
-  "FilingDate": "2024-01-15"
-}
-```
+**Version Management**: Track fee schedule changes over time with effective dates and regulatory references, enabling historical queries and impact analysis.
 
 ---
 
-## Temporal Operations
+## Writing Your First Script
 
-IPFLang includes temporal operators for deadline calculations and time-based fee logic. These are available programmatically through the IPFLang.Engine API for advanced scenarios.
+Let's start with something simple—a basic filing fee that depends on entity type:
 
-**Supported Operations:**
-- **Business day calculations**: Add/subtract business days, excluding weekends
-- **Late fee calculations**: Multiplier-based (daily increase) or stepped (tier-based)
-- **Renewal date calculations**: Patent renewal cycles based on filing dates
-- **Priority period validation**: Paris Convention 12-month priority checks
-- **Grace period checking**: Payment deadline extensions
+```
+DEFINE LIST EntityType AS 'Entity type'
+CHOICE Large AS 'Large entity'
+CHOICE Small AS 'Small entity'
+DEFAULT Large
+ENDDEFINE
 
-**Use Cases:**
-- Automatic late fee calculations based on filing date
-- Renewal reminder systems with accurate date calculations
-- Priority right validation for international filings
-- Grace period extensions with fee multipliers
-- Business day deadline calculations (excluding weekends/holidays)
+COMPUTE FEE FilingFee
+YIELD 1000 IF EntityType EQ Large
+YIELD 500 IF EntityType EQ Small
+ENDCOMPUTE
+
+RETURN Total AS 'Total Filing Fee'
+```
+
+This script defines one input (EntityType), computes one fee (FilingFee), and returns one value (Total). Notice how readable it is—the `YIELD` statements read almost like English sentences.
 
 ---
 
-## Jurisdiction Composition
+## Comments
 
-IPFLang supports jurisdiction inheritance and composition for code reuse across related fee schedules.
+As your scripts grow, you'll want to annotate them. Use the `#` character to start a comment that extends to the end of the line:
 
-**Why Use Jurisdiction Composition?**
+---
 
-In intellectual property fee calculations, jurisdictions often share common structures but with local variations:
-- **Regional → National**: EPO defines base fees; national phases (Germany, France) add or override specific fees
-- **Federal → State**: USPTO defines federal fees; state-level filings may have additional requirements
-- **International → Regional**: PCT provides a base which regional offices then customize
-
-**How It Works:**
-
-1. Create a **base jurisdiction** file with common inputs and fees
-2. Create **child jurisdiction** files that inherit from the base
-3. Child jurisdictions can:
-   - **Inherit** inputs and fees from parent (no redefinition needed)
-   - **Override** fees by defining them with the same name
-   - **Add** new inputs and fees specific to that jurisdiction
-
-**CLI Usage:**
-
-```bash
-# Compose parent and child jurisdictions
-dotnet run --project src/IPFLang.CLI -- compose parent.ipf child.ipf
-
-# Show inheritance analysis
-dotnet run --project src/IPFLang.CLI -- compose parent.ipf child.ipf --analysis
+```
+# This is a full-line comment
+DEFINE NUMBER ClaimCount AS 'Number of claims'  # Inline comment after code
+BETWEEN 0 AND 100
+DEFAULT 1
+ENDDEFINE
 ```
 
-**Example - EPO Base (parent.ipf):**
+Comments can appear anywhere except inside quoted strings. They're invaluable for documenting the reasoning behind complex fee structures or noting regulatory references.
+
+---
+
+## Version Declaration
+
+Fee schedules change over time. Patent offices adjust their prices annually, regulators issue new rules, and courts clarify interpretations. IPFLang's version system helps you track these changes systematically.
+
+At the top of your script, you can declare a version with an effective date and optional metadata:
+```
+VERSION '<VersionId>' EFFECTIVE yyyy-MM-dd [DESCRIPTION '<description>'] [REFERENCE '<reference>']
+```
+
+The version identifier should be unique—many organizations use year-based schemes like '2024.1' or semantic versioning like '1.2.0'. The effective date tells you when this version goes into force. Descriptions and regulatory references are optional but highly recommended for auditability.
+
+Here's the simplest form:
+```
+VERSION '2024.1' EFFECTIVE 2024-01-15
+```
+
+Adding a description makes it easier to understand what changed:
+```
+VERSION '2024.1' EFFECTIVE 2024-01-15 DESCRIPTION 'Annual fee increase'
+```
+
+For compliance and auditing, include a regulatory reference:
+```
+VERSION '2024.1' EFFECTIVE 2024-01-15 REFERENCE 'Federal Register Vol. 89, No. 123'
+```
+
+You can combine all elements for maximum clarity:
+```
+VERSION '2024.1' EFFECTIVE 2024-01-15 DESCRIPTION 'USPTO fee increase' REFERENCE 'Federal Register Vol. 89, No. 123'
+
+DEFINE NUMBER ClaimCount AS 'Number of claims'
+BETWEEN 1 AND 100
+DEFAULT 1
+ENDDEFINE
+
+COMPUTE FEE FilingFee RETURN USD
+  YIELD 100<USD>
+ENDCOMPUTE
+```
+
+Version declarations are optional but highly recommended, especially for fee schedules that change regularly. Place them at the very top of your script, before any other definitions. Each script can have only one version directive.
+
+When you work with IPFLang programmatically, the version system unlocks powerful capabilities: comparing versions to see what changed, querying historical fees as they were on a specific date, and analyzing the impact of fee changes across different scenarios.
+
+---
+
+## Input Definitions
+
+Inputs are the questions you ask your users. IPFLang provides six input types, each designed for a specific kind of data. Let's explore each one.
+
+### LIST Input
+
+The LIST input presents users with a set of choices and allows them to select exactly one. Think of it as a dropdown menu or radio button group.
+```
+DEFINE LIST <Name> AS '<Display Text>'
+CHOICE <Symbol1> AS '<Label1>'
+CHOICE <Symbol2> AS '<Label2>'
+...
+DEFAULT <DefaultSymbol>
+GROUP <GroupName>
+ENDDEFINE
+```
+
+Here's an entity type selector with three choices:
+```
+DEFINE LIST EntityType AS 'Entity type'
+CHOICE NormalEntity AS 'Normal entity'
+CHOICE SmallEntity AS 'Small entity'
+CHOICE MicroEntity AS 'Micro entity'
+DEFAULT NormalEntity
+GROUP General
+ENDDEFINE
+```
+
+Each `CHOICE` has a symbol (like `NormalEntity`) that you'll use in your code, and a label (like `'Normal entity'`) that users will see. The `DEFAULT` specifies which choice is pre-selected. The optional `GROUP` organizes this input in the user interface—more on groups later.
+
+In your fee computations, you test against the symbols:
+```
+YIELD 100 IF EntityType EQ NormalEntity
+YIELD 50 IF EntityType EQ SmallEntity
+```
+
+---
+
+### MULTILIST Input
+
+Sometimes users need to select multiple items from a list. MULTILIST handles this—think checkboxes rather than radio buttons.
+
+Consider designation countries for a European patent:
+```
+DEFINE MULTILIST DesignationCountries AS 'Designation countries'
+CHOICE DE AS 'Germany'
+CHOICE FR AS 'France'
+CHOICE GB AS 'United Kingdom'
+CHOICE IT AS 'Italy'
+DEFAULT DE,FR
+GROUP Designations
+ENDDEFINE
+```
+
+The `DEFAULT` can specify multiple pre-selected items, separated by commas.
+
+MULTILIST inputs have a special property: `!COUNT` returns how many items were selected. This is perfect for per-country fees:
+```
+YIELD 100 * DesignationCountries!COUNT
+```
+
+This charges 100 units for each designated country.
+
+---
+
+### NUMBER Input
+
+For numeric inputs like claim counts or page counts, use NUMBER. You can specify minimum and maximum bounds to prevent invalid values:
+```
+DEFINE NUMBER ClaimCount AS 'Number of claims'
+BETWEEN 1 AND 1000
+DEFAULT 10
+GROUP Claims
+ENDDEFINE
+
+DEFINE NUMBER PageCount AS 'Number of pages'
+BETWEEN 1 AND 500
+DEFAULT 30
+GROUP Application
+ENDDEFINE
+```
+
+NUMBER inputs participate in arithmetic naturally. Here's a common pattern—charging for claims beyond a threshold:
+```
+# Excess claims fee (claims over 10)
+LET ExcessClaims AS ClaimCount - 10
+YIELD 50 * ExcessClaims IF ExcessClaims GT 0
+```
+
+This calculates how many claims exceed 10 and charges $50 for each excess claim.
+
+---
+
+### BOOLEAN Input
+
+For yes/no questions, BOOLEAN provides a simple true/false choice:
+```
+DEFINE BOOLEAN RequestsExamination AS 'Requests examination'
+DEFAULT TRUE
+GROUP Examination
+ENDDEFINE
+
+DEFINE BOOLEAN ClaimsSequenceListing AS 'Contains sequence listing'
+DEFAULT FALSE
+GROUP Claims
+ENDDEFINE
+```
+
+Use it in conditions just like you'd expect:
+```
+YIELD 500 IF RequestsExamination EQ TRUE
+```
+
+This charges a $500 examination fee only if examination was requested.
+
+---
+
+### DATE Input
+
+Many IP fees depend on dates—filing dates, priority dates, renewal dates. DATE inputs handle temporal data with bounds checking.
+
+Dates are written in `dd.MM.yyyy` format (day, month, year). The special keyword `TODAY` refers to the current date:
+```
+DEFINE DATE FilingDate AS 'Filing date'
+BETWEEN 01.01.2000 AND TODAY
+DEFAULT TODAY
+GROUP Application
+ENDDEFINE
+
+DEFINE DATE PriorityDate AS 'Priority date'
+BETWEEN 01.01.1990 AND TODAY
+DEFAULT 01.01.2024
+GROUP Priority
+ENDDEFINE
+```
+
+DATE inputs come with powerful properties for temporal calculations:
+- `!YEARSTONOW` - Years from the date to today
+- `!MONTHSTONOW` - Months from the date to today
+- `!DAYSTONOW` - Days from the date to today
+- `!MONTHSTONOW_FROMLASTDAY` - Months from the end of the date's month to today
+
+These properties enable annuity calculations, late fee assessments, and deadline tracking:
+```
+# Annuity calculation based on years since filing
+LET YearsSinceFiling AS FilingDate!YEARSTONOW
+YIELD 100 * FLOOR(YearsSinceFiling)
+```
+
+This charges $100 per complete year since the filing date.
+
+---
+
+### AMOUNT Input
+
+Sometimes users need to provide monetary amounts as inputs—translation costs, search fees, or other variable expenses. AMOUNT handles this, but unlike plain numbers, it enforces currency awareness.
+
+When you define an AMOUNT, you specify which currency it uses:
+```
+DEFINE AMOUNT PriorArtSearchFee AS 'Prior art search fee'
+CURRENCY EUR
+DEFAULT 1500
+GROUP Search
+ENDDEFINE
+
+DEFINE AMOUNT TranslationCost AS 'Translation cost'
+CURRENCY USD
+DEFAULT 2000
+GROUP Translation
+ENDDEFINE
+```
+
+The currency code (like EUR or USD) must be a valid ISO 4217 code. Once defined, IPFLang's type system ensures you don't accidentally mix currencies:
+```
+# Same-currency arithmetic is type-safe
+YIELD PriorArtSearchFee + 500<EUR>
+
+# Mixed currencies cause compile-time type error!
+# YIELD PriorArtSearchFee + TranslationCost  # ERROR: EUR + USD
+```
+
+This catches errors before they reach production. If you need to combine different currencies, you must use explicit conversion (covered later).
+
+---
+
+## Organizing with Groups
+
+As your scripts grow, you'll accumulate many inputs. Groups help organize them into logical sections for better user experience.
+
+Define groups with a name, display label, and weight:
+```
+DEFINE GROUP General AS 'General Information' WITH WEIGHT 1
+DEFINE GROUP Claims AS 'Claims Information' WITH WEIGHT 2
+DEFINE GROUP Fees AS 'Fee Options' WITH WEIGHT 3
+```
+
+The weight determines display order—lower numbers appear first. This lets you control how inputs are presented to users. When you define an input, you can assign it to a group:
+```
+DEFINE NUMBER ClaimCount AS 'Number of claims'
+BETWEEN 1 AND 1000
+DEFAULT 10
+GROUP Claims
+ENDDEFINE
+```
+
+This groups all claim-related inputs together in the interface.
+
+---
+
+## Fee Computations
+
+Now we reach the heart of IPFLang—computing fees. Every fee calculation begins with `COMPUTE FEE` and ends with `ENDCOMPUTE`. Inside, you use `YIELD` statements to produce values.
+
+### Basic Fees
+
+The simplest fee just yields a constant:
+```
+COMPUTE FEE FilingFee
+YIELD 500
+ENDCOMPUTE
+```
+
+This filing fee is always $500, regardless of inputs. Of course, real fees are rarely this simple.
+
+---
+
+### Optional Fees
+
+Some fees are optional—expedited processing, for example. Mark these with the `OPTIONAL` keyword:
+```
+COMPUTE FEE ExpeditedProcessingFee OPTIONAL
+YIELD 1000
+ENDCOMPUTE
+```
+
+Optional fees are computed and displayed, but reported separately from mandatory fees in totals. This helps users understand which costs they can avoid.
+
+---
+
+### Cases and Conditions
+
+Most fees vary based on inputs. You have two ways to express this: simple conditional yields, or structured CASE blocks.
+
+For straightforward conditions, put `IF` directly on the yield:
+```
+COMPUTE FEE SimpleFee
+YIELD 100 IF EntityType EQ MicroEntity
+YIELD 200 IF EntityType EQ SmallEntity
+YIELD 400 IF EntityType EQ NormalEntity
+ENDCOMPUTE
+```
+
+For more complex logic, especially when one input affects multiple calculations, use CASE blocks:
+```
+COMPUTE FEE EntityBasedFee
+CASE EntityType EQ NormalEntity AS
+  YIELD 1000 IF ClaimCount LTE 20
+  YIELD 1000 + (50 * (ClaimCount - 20)) IF ClaimCount GT 20
+ENDCASE
+CASE EntityType EQ SmallEntity AS
+  YIELD 500 IF ClaimCount LTE 20
+  YIELD 500 + (25 * (ClaimCount - 20)) IF ClaimCount GT 20
+ENDCASE
+CASE EntityType EQ MicroEntity AS
+  YIELD 250 IF ClaimCount LTE 20
+  YIELD 250 + (12 * (ClaimCount - 20)) IF ClaimCount GT 20
+ENDCASE
+ENDCOMPUTE
+```
+
+Each CASE groups related logic together. This reads more naturally and makes completeness verification more effective: IPFLang can check that each entity type has a complete set of rules.
+
+---
+
+### Local Variables
+
+Fee calculations often involve intermediate values. The `LET` keyword lets you name these values, making your logic clearer and avoiding repetition:
+```
+COMPUTE FEE ExcessClaimsFee
+LET ExcessClaims AS ClaimCount - 10
+LET ExcessPages AS PageCount - 30
+YIELD 50 * ExcessClaims IF ExcessClaims GT 0
+YIELD 20 * ExcessPages IF ExcessPages GT 0
+ENDCOMPUTE
+```
+
+---
+
+Here, `ExcessClaims` and `ExcessPages` are computed once and reused. This is clearer than writing `ClaimCount - 10` multiple times, and it ensures consistency.
+
+### Polymorphic Fees
+
+Advanced users sometimes need fees that work with multiple currencies. Polymorphic fees provide this flexibility through type parameters:
+```
+# A fee that returns the same currency type it receives
+COMPUTE FEE ScaledFee<C> RETURN C
+YIELD 100<C> * Multiplier
+ENDCOMPUTE
+```
+
+The `<C>` is a type variable—a placeholder for whatever currency you use when invoking the fee. This fee can work with EUR, USD, or any other currency, maintaining type safety throughout.
+
+---
+
+## Expressions
+
+Expressions are the building blocks of your fee calculations. IPFLang provides familiar arithmetic, comparison, and logical operators.
+
+### Arithmetic Operators
+
+IPFLang supports the standard arithmetic operations you'd expect:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `+` | Addition | `ClaimCount + 5` |
+| `-` | Subtraction | `ClaimCount - 10` |
+| `*` | Multiplication | `50 * ExcessClaims` |
+| `/` | Division | `TotalFee / 2` |
+| `( )` | Grouping | `(ClaimCount - 10) * 50` |
+
+Combine them naturally:
+```
+LET ExcessClaims AS ClaimCount - 10
+LET BaseFee AS 500
+YIELD BaseFee + (ExcessClaims * 50)
+```
+
+Parentheses work as you'd expect, controlling order of operations.
+
+---
+
+### Comparison Operators
+
+For conditional logic, IPFLang provides readable comparison operators. Rather than symbols like `==` or `<=`, it uses words:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `EQ` | Equal | `EntityType EQ NormalEntity` |
+| `NEQ` | Not equal | `EntityType NEQ MicroEntity` |
+| `LT` | Less than | `ClaimCount LT 10` |
+| `LTE` | Less than or equal | `ClaimCount LTE 20` |
+| `GT` | Greater than | `ClaimCount GT 10` |
+| `GTE` | Greater than or equal | `ClaimCount GTE 5` |
+| `IN` | Is in list | `Country IN DesignatedCountries` |
+| `NIN` | Not in list | `Country NIN ExcludedCountries` |
+
+The `IN` and `NIN` operators test membership in MULTILIST selections, perfect for per-country calculations.
+
+---
+
+### Logical Operators
+
+Combine conditions with `AND` and `OR`:
+
+| Operator | Description | Example |
+|----------|-------------|---------|
+| `AND` | Logical AND | `ClaimCount GT 10 AND EntityType EQ NormalEntity` |
+| `OR` | Logical OR | `EntityType EQ SmallEntity OR EntityType EQ MicroEntity` |
+
+Use parentheses to group complex conditions:
+```
+YIELD 1000 IF ClaimCount GT 20 AND EntityType EQ NormalEntity
+YIELD 500 IF ClaimCount GT 20 AND (EntityType EQ SmallEntity OR EntityType EQ MicroEntity)
+```
+
+This charges different fees based on both claim count and entity type.
+
+---
+
+### Built-in Functions
+
+IPFLang includes functions for rounding and other mathematical operations:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `ROUND(x)` | Round to nearest integer | `ROUND(Fee / 10) * 10` |
+| `FLOOR(x)` | Round down | `FLOOR(YearsSinceFiling)` |
+| `CEIL(x)` | Round up | `CEIL(MonthsRemaining / 12)` |
+
+These are essential for calculations involving dates and partial values:
+```
+LET Years AS FLOOR(FilingDate!YEARSTONOW)
+YIELD 100 * Years
+```
+
+`FLOOR` ensures you charge only for complete years, not partial ones.
+
+---
+
+### Currency Literals
+
+One of IPFLang's most powerful features is its currency-aware type system. To create a monetary value with a specific currency, annotate a number with an ISO 4217 currency code:
+```
+100<EUR>      # 100 Euros
+50.50<USD>    # 50.50 US Dollars
+1000<GBP>     # 1000 British Pounds
+250<JPY>      # 250 Japanese Yen
+```
+
+The syntax is straightforward: `100<EUR>`, `50.50<USD>`, etc.
+
+What makes this powerful is type safety. You can add or subtract same-currency values freely:
+```
+YIELD 100<EUR> + 50<EUR>           # Valid: 150 EUR
+YIELD 100<EUR> * 2                 # Valid: 200 EUR (scalar multiplication)
+```
+
+But mixing currencies triggers a compile-time error:
+```
+YIELD 100<EUR> + 50<USD>           # TYPE ERROR: Cannot mix EUR and USD
+```
+
+This catches mistakes that could otherwise lead to serious financial errors. If you need to combine different currencies, use explicit conversion.
+
+---
+
+### Currency Conversion
+
+When you need to combine amounts in different currencies, use the `CONVERT` function:
+```
+CONVERT(<Amount>, <SourceCurrency>, <TargetCurrency>)
+```
+
+This performs runtime conversion using exchange rates:
+```
+# Convert USD amount to EUR
+YIELD CONVERT(100<USD>, USD, EUR) + 50<EUR>
+
+# Convert an amount variable
+YIELD CONVERT(TranslationCost, USD, EUR) + PriorArtSearchFee
+```
+
+The conversion is explicit and visible in your code, making it clear where currency mixing occurs. This transparency helps with auditing and prevents accidental conversions.
+
+**How Exchange Rates Work:**
+
+IPFLang fetches exchange rates from [exchangerate-api.com](https://exchangerate-api.com), which provides ECB-based (European Central Bank) data. All rates are relative to EUR as the base currency. When you convert between two currencies, the system calculates: `amount / sourceRate * targetRate`.
+
+The exchange rate data:
+- Requires an API key for live rates (obtained from exchangerate-api.com)
+- Is cached and refreshed periodically, not fetched on every conversion
+- Includes timestamps showing when rates were last updated
+- Covers all 161 ISO 4217 currency codes
+
+For testing and development, the system can use mock exchange rates with fixed values. This ensures your scripts work even without network connectivity or API keys.
+
+---
+
+## Returns
+
+After computing all your fees, you'll want to report results. The `RETURN` directive defines named outputs:
+```
+RETURN TotalMandatory AS 'Total mandatory fees'
+RETURN TotalOptional AS 'Total optional fees'
+RETURN GrandTotal AS 'Grand total'
+```
+
+Each return has a symbol (used internally) and a display label (shown to users). The system automatically calculates totals based on your fee definitions—mandatory fees, optional fees, and combined totals.
+
+---
+
+## Verification Directives
+
+IPFLang's verification system helps you catch errors before they affect real calculations. These static analyses run at compile time, not runtime.
+
+### VERIFY COMPLETE
+
+Completeness verification ensures your fee covers all possible input combinations. No gaps, no missed cases:
+
+```
+DEFINE LIST EntityType AS 'Entity type'
+CHOICE Normal AS 'Normal'
+CHOICE Small AS 'Small'
+DEFAULT Normal
+ENDDEFINE
+
+COMPUTE FEE BasicFee
+YIELD 100 IF EntityType EQ Normal
+YIELD 50 IF EntityType EQ Small
+ENDCOMPUTE
+
+VERIFY COMPLETE FEE BasicFee
+```
+
+The verification analyzes your fee logic and confirms that every EntityType value has a corresponding yield. If you forget a case, IPFLang reports exactly which combination is missing. This is invaluable for complex fee schedules with multiple inputs—manually checking all combinations becomes impractical, but automated verification catches every gap.
+
+---
+
+### VERIFY MONOTONIC
+
+Monotonicity verification checks that a fee behaves sensibly with respect to numeric inputs. In most cases, more of something (more claims, more pages) should never decrease the fee:
+```
+DEFINE NUMBER ClaimCount AS 'Number of claims'
+BETWEEN 1 AND 100
+DEFAULT 10
+ENDDEFINE
+
+COMPUTE FEE ClaimFee
+LET ExcessClaims AS ClaimCount - 10
+YIELD 50 * ExcessClaims IF ExcessClaims GT 0
+YIELD 0 IF ExcessClaims LTE 0
+ENDCOMPUTE
+
+VERIFY MONOTONIC FEE ClaimFee WITH RESPECT TO ClaimCount
+```
+
+This verification confirms that increasing ClaimCount never decreases ClaimFee. If you accidentally wrote logic that reduced fees at higher claim counts, IPFLang would catch it and show you the exact values where the violation occurs.
+
+You can specify different monotonicity directions:
+- `NonDecreasing` (default) - Fee never decreases as input increases
+- `NonIncreasing` - Fee never increases as input increases  
+- `StrictlyIncreasing` - Fee always increases (no flat sections)
+- `StrictlyDecreasing` - Fee always decreases
+
+Most IP fees are non-decreasing, but the flexibility is there when you need it.
+
+---
+
+## Advanced Features
+
+### Temporal Operations
+
+IP fees often involve time—filing deadlines, renewal dates, late fees, priority periods. IPFLang includes temporal operators for these scenarios, available through the programmatic API.
+
+The system supports:
+- **Business day calculations**: Add or subtract business days, automatically excluding weekends
+- **Late fee calculations**: Apply multipliers that increase daily, or use stepped tiers
+- **Renewal date calculations**: Compute patent renewal cycles from filing dates
+- **Priority period validation**: Check Paris Convention 12-month priority windows
+- **Grace period logic**: Model payment deadline extensions with fee adjustments
+
+These operations integrate with DATE inputs and their temporal properties (`!YEARSTONOW`, `!MONTHSTONOW`, etc.), enabling sophisticated time-based fee logic.
+
+### Jurisdiction Composition
+
+Real-world IP fee schedules often follow hierarchical patterns. The European Patent Office defines base fees, then Germany, France, and other countries add national-phase specifics. The USPTO defines federal fees, then state-level filings add local requirements.
+
+IPFLang's composition system lets you model these relationships explicitly. Create a base jurisdiction file with common inputs and fees, then create child jurisdiction files that inherit from it:
+
+**Base Jurisdiction (epo_base.ipf):**
 ```
 VERSION '2024.1' EFFECTIVE 2024-01-01 DESCRIPTION 'EPO Base Fees'
 
@@ -227,18 +712,18 @@ ENDCOMPUTE
 VERIFY COMPLETE FEE FilingFee
 ```
 
-**Example - EPO Germany (child.ipf):**
+**Child Jurisdiction (epo_germany.ipf):**
 ```
 VERSION '2024.2' EFFECTIVE 2024-01-01 DESCRIPTION 'EPO German National Phase'
 
-# This file inherits ApplicantType and FilingFee from parent
+# Inherits ApplicantType and FilingFee from parent
 
-# Add new Germany-specific input
+# Add Germany-specific input
 DEFINE BOOLEAN NeedsTranslation AS 'Translation to German required'
 DEFAULT TRUE
 ENDDEFINE
 
-# Add new Germany-specific fee
+# Add Germany-specific fee
 COMPUTE FEE GermanTranslationFee
 CASE NeedsTranslation EQ TRUE AS
   YIELD 1050<EUR>
@@ -251,616 +736,19 @@ ENDCOMPUTE
 VERIFY COMPLETE FEE GermanTranslationFee
 ```
 
-**Composition Result:**
-When you run `compose parent.ipf child.ipf`:
-- Inputs: `ApplicantType` (inherited) + `NeedsTranslation` (new)
-- Fees: `FilingFee` (inherited) + `GermanTranslationFee` (new)
-- Verifications: Both `VERIFY` directives are combined
-
-**Benefits:**
-- **Code Reuse**: Share 60-80% of fee definitions between related jurisdictions
-- **Maintenance**: Update base fees once, changes propagate to all children
-- **Consistency**: Ensure related jurisdictions use compatible fee structures
-- **Auditability**: Clear tracing of which jurisdiction contributed which fee
-
----
-
-## Comments
-
-Use `#` for single-line comments. Comments can appear anywhere except inside quoted strings.
-
-```
-# This is a comment
-DEFINE NUMBER ClaimCount AS 'Number of claims'  # Inline comment
-BETWEEN 0 AND 100
-DEFAULT 1
-ENDDEFINE
-```
-
----
-
-## Version Declaration
-
-Declare the version of a fee schedule with an effective date and optional metadata. This enables version tracking and temporal queries.
-
-**Syntax:**
-```
-VERSION '<VersionId>' EFFECTIVE yyyy-MM-dd [DESCRIPTION '<description>'] [REFERENCE '<reference>']
-```
-
-**Parameters:**
-- `VersionId`: Unique identifier for this version (e.g., '2024.1', '1.0.0')
-- `EFFECTIVE yyyy-MM-dd`: Date when this version becomes effective (ISO 8601 format)
-- `DESCRIPTION` (optional): Human-readable description of changes
-- `REFERENCE` (optional): Regulatory reference (e.g., Federal Register citation)
-
-**Examples:**
-
-Basic version declaration:
-```
-VERSION '2024.1' EFFECTIVE 2024-01-15
-```
-
-With description:
-```
-VERSION '2024.1' EFFECTIVE 2024-01-15 DESCRIPTION 'Annual fee increase'
-```
-
-With regulatory reference:
-```
-VERSION '2024.1' EFFECTIVE 2024-01-15 REFERENCE 'Federal Register Vol. 89, No. 123'
-```
-
-Complete example:
-```
-VERSION '2024.1' EFFECTIVE 2024-01-15 DESCRIPTION 'USPTO fee increase' REFERENCE 'Federal Register Vol. 89, No. 123'
-
-DEFINE NUMBER ClaimCount AS 'Number of claims'
-BETWEEN 1 AND 100
-DEFAULT 1
-ENDDEFINE
-
-COMPUTE FEE FilingFee RETURN USD
-  YIELD 100<USD>
-ENDCOMPUTE
-```
-
-**Notes:**
-- Version declaration is optional but recommended for tracking fee schedule changes
-- Only one VERSION directive is allowed per script
-- Version directive should appear at the beginning of the script
-- Effective date uses yyyy-MM-dd format (e.g., 2024-01-15)
-
-**Advanced Features (API):**
-
-The IPFLang.Engine provides programmatic access to advanced version management features:
-
-- **Version Comparison**: Compare two versions to identify added, removed, and modified fees
-- **Breaking Change Detection**: Automatically classify changes as breaking or non-breaking
-- **Temporal Queries**: Calculate fees as they were on a specific historical date
-- **Impact Analysis**: Analyze how fee changes affect different input scenarios
-- **Validation Reports**: Generate comprehensive reports of version transitions
-
----
-
-## Input Definitions
-
-### LIST Input
-
-A single-selection dropdown list.
-
-**Syntax:**
-```
-DEFINE LIST <Name> AS '<Display Text>'
-CHOICE <Symbol1> AS '<Label1>'
-CHOICE <Symbol2> AS '<Label2>'
-...
-DEFAULT <DefaultSymbol>
-GROUP <GroupName>
-ENDDEFINE
-```
-
-**Example:**
-```
-DEFINE LIST EntityType AS 'Entity type'
-CHOICE NormalEntity AS 'Normal entity'
-CHOICE SmallEntity AS 'Small entity'
-CHOICE MicroEntity AS 'Micro entity'
-DEFAULT NormalEntity
-GROUP General
-ENDDEFINE
-```
-
-**Usage in expressions:**
-```
-YIELD 100 IF EntityType EQ NormalEntity
-YIELD 50 IF EntityType EQ SmallEntity
-```
-
----
-
-### MULTILIST Input
-
-A multiple-selection list where users can choose several options.
-
-**Syntax:**
-```
-DEFINE MULTILIST <Name> AS '<Display Text>'
-CHOICE <Symbol1> AS '<Label1>'
-CHOICE <Symbol2> AS '<Label2>'
-...
-DEFAULT <Symbol1>,<Symbol2>
-GROUP <GroupName>
-ENDDEFINE
-```
-
-**Example:**
-```
-DEFINE MULTILIST DesignationCountries AS 'Designation countries'
-CHOICE DE AS 'Germany'
-CHOICE FR AS 'France'
-CHOICE GB AS 'United Kingdom'
-CHOICE IT AS 'Italy'
-DEFAULT DE,FR
-GROUP Designations
-ENDDEFINE
-```
-
-**Special properties:**
-- `<Name>!COUNT` - Returns the number of selected items
-
-**Usage:**
-```
-YIELD 100 * DesignationCountries!COUNT
-```
-
----
-
-### NUMBER Input
-
-An integer input with optional bounds.
-
-**Syntax:**
-```
-DEFINE NUMBER <Name> AS '<Display Text>'
-BETWEEN <Min> AND <Max>
-DEFAULT <DefaultValue>
-GROUP <GroupName>
-ENDDEFINE
-```
-
-**Example:**
-```
-DEFINE NUMBER ClaimCount AS 'Number of claims'
-BETWEEN 1 AND 1000
-DEFAULT 10
-GROUP Claims
-ENDDEFINE
-
-DEFINE NUMBER PageCount AS 'Number of pages'
-BETWEEN 1 AND 500
-DEFAULT 30
-GROUP Application
-ENDDEFINE
-```
-
-**Usage:**
-```
-# Excess claims fee (claims over 10)
-LET ExcessClaims AS ClaimCount - 10
-YIELD 50 * ExcessClaims IF ExcessClaims GT 0
-```
-
----
-
-### BOOLEAN Input
-
-A true/false checkbox input.
-
-**Syntax:**
-```
-DEFINE BOOLEAN <Name> AS '<Display Text>'
-DEFAULT TRUE|FALSE
-GROUP <GroupName>
-ENDDEFINE
-```
-
-**Example:**
-```
-DEFINE BOOLEAN RequestsExamination AS 'Requests examination'
-DEFAULT TRUE
-GROUP Examination
-ENDDEFINE
-
-DEFINE BOOLEAN ClaimsSequenceListing AS 'Contains sequence listing'
-DEFAULT FALSE
-GROUP Claims
-ENDDEFINE
-```
-
-**Usage:**
-```
-YIELD 500 IF RequestsExamination EQ TRUE
-```
-
----
-
-### DATE Input
-
-A date input with optional bounds. Dates use `dd.MM.yyyy` format.
-
-**Syntax:**
-```
-DEFINE DATE <Name> AS '<Display Text>'
-BETWEEN <MinDate> AND <MaxDate>
-DEFAULT <DefaultDate>
-GROUP <GroupName>
-ENDDEFINE
-```
-
-Special date values:
-- `TODAY` - Current date
-
-**Example:**
-```
-DEFINE DATE FilingDate AS 'Filing date'
-BETWEEN 01.01.2000 AND TODAY
-DEFAULT TODAY
-GROUP Application
-ENDDEFINE
-
-DEFINE DATE PriorityDate AS 'Priority date'
-BETWEEN 01.01.1990 AND TODAY
-DEFAULT 01.01.2024
-GROUP Priority
-ENDDEFINE
-```
-
-**Special properties:**
-- `<Name>!YEARSTONOW` - Years from date to today
-- `<Name>!MONTHSTONOW` - Months from date to today
-- `<Name>!DAYSTONOW` - Days from date to today
-- `<Name>!MONTHSTONOW_FROMLASTDAY` - Months from end of date's month to today
-
-**Usage:**
-```
-# Annuity calculation based on years since filing
-LET YearsSinceFiling AS FilingDate!YEARSTONOW
-YIELD 100 * FLOOR(YearsSinceFiling)
-```
-
----
-
-### AMOUNT Input
-
-*(Currency-Aware Feature)*
-
-A monetary amount with an associated ISO 4217 currency code.
-
-**Syntax:**
-```
-DEFINE AMOUNT <Name> AS '<Display Text>'
-CURRENCY <ISO4217Code>
-DEFAULT <Value>
-GROUP <GroupName>
-ENDDEFINE
-```
-
-**Example:**
-```
-DEFINE AMOUNT PriorArtSearchFee AS 'Prior art search fee'
-CURRENCY EUR
-DEFAULT 1500
-GROUP Search
-ENDDEFINE
-
-DEFINE AMOUNT TranslationCost AS 'Translation cost'
-CURRENCY USD
-DEFAULT 2000
-GROUP Translation
-ENDDEFINE
-```
-
-**Usage:**
-```
-# Same-currency arithmetic is type-safe
-YIELD PriorArtSearchFee + 500<EUR>
-
-# Mixed currencies cause compile-time type error!
-# YIELD PriorArtSearchFee + TranslationCost  # ERROR: EUR + USD
-```
-
----
-
-## Groups
-
-Groups organize inputs in the user interface.
-
-**Syntax:**
-```
-DEFINE GROUP <Name> AS '<Display Text>' WITH WEIGHT <Weight>
-```
-
-Weight determines display order (lower weights appear first).
-
-**Example:**
-```
-DEFINE GROUP General AS 'General Information' WITH WEIGHT 1
-DEFINE GROUP Claims AS 'Claims Information' WITH WEIGHT 2
-DEFINE GROUP Fees AS 'Fee Options' WITH WEIGHT 3
-```
-
----
-
-## Fee Computations
-
-### Basic Fees
-
-**Syntax:**
-```
-COMPUTE FEE <Name>
-<Yields and Cases>
-ENDCOMPUTE
-```
-
-**Example:**
-```
-COMPUTE FEE FilingFee
-YIELD 500
-ENDCOMPUTE
-```
-
----
-
-### Optional Fees
-
-Optional fees are computed but reported separately from mandatory fees.
-
-**Syntax:**
-```
-COMPUTE FEE <Name> OPTIONAL
-<Yields and Cases>
-ENDCOMPUTE
-```
-
-**Example:**
-```
-COMPUTE FEE ExpeditedProcessingFee OPTIONAL
-YIELD 1000
-ENDCOMPUTE
-```
-
----
-
-### Cases and Conditions
-
-Use `CASE` blocks for complex conditional logic.
-
-**Syntax:**
-```
-COMPUTE FEE <Name>
-CASE <Condition> AS
-  YIELD <Expression> IF <Condition>
-  YIELD <Expression>
-ENDCASE
-CASE <Condition> AS
-  YIELD <Expression>
-ENDCASE
-ENDCOMPUTE
-```
-
-**Example:**
-```
-COMPUTE FEE EntityBasedFee
-CASE EntityType EQ NormalEntity AS
-  YIELD 1000 IF ClaimCount LTE 20
-  YIELD 1000 + (50 * (ClaimCount - 20)) IF ClaimCount GT 20
-ENDCASE
-CASE EntityType EQ SmallEntity AS
-  YIELD 500 IF ClaimCount LTE 20
-  YIELD 500 + (25 * (ClaimCount - 20)) IF ClaimCount GT 20
-ENDCASE
-CASE EntityType EQ MicroEntity AS
-  YIELD 250 IF ClaimCount LTE 20
-  YIELD 250 + (12 * (ClaimCount - 20)) IF ClaimCount GT 20
-ENDCASE
-ENDCOMPUTE
-```
-
-**Simple conditional yields (without CASE):**
-```
-COMPUTE FEE SimpleFee
-YIELD 100 IF EntityType EQ MicroEntity
-YIELD 200 IF EntityType EQ SmallEntity
-YIELD 400 IF EntityType EQ NormalEntity
-ENDCOMPUTE
-```
-
----
-
-### Local Variables
-
-Use `LET` to define computed variables within a fee.
-
-**Syntax:**
-```
-LET <VarName> AS <Expression>
-```
-
-**Example:**
-```
-COMPUTE FEE ExcessClaimsFee
-LET ExcessClaims AS ClaimCount - 10
-LET ExcessPages AS PageCount - 30
-YIELD 50 * ExcessClaims IF ExcessClaims GT 0
-YIELD 20 * ExcessPages IF ExcessPages GT 0
-ENDCOMPUTE
-```
-
----
-
-### Polymorphic Fees
-
-*(Currency-Aware Feature)*
-
-Define fees that work with any currency, specified at instantiation.
-
-**Syntax:**
-```
-COMPUTE FEE <Name><<TypeVar>> RETURN <TypeVar>
-<Yields using TypeVar>
-ENDCOMPUTE
-```
-
-**Example:**
-```
-# A fee that returns the same currency type it receives
-COMPUTE FEE ScaledFee<C> RETURN C
-YIELD 100<C> * Multiplier
-ENDCOMPUTE
-```
-
----
-
-## Expressions
-
-### Arithmetic Operators
-
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `+` | Addition | `ClaimCount + 5` |
-| `-` | Subtraction | `ClaimCount - 10` |
-| `*` | Multiplication | `50 * ExcessClaims` |
-| `/` | Division | `TotalFee / 2` |
-| `( )` | Grouping | `(ClaimCount - 10) * 50` |
-
-**Example:**
-```
-LET ExcessClaims AS ClaimCount - 10
-LET BaseFee AS 500
-YIELD BaseFee + (ExcessClaims * 50)
-```
-
----
-
-### Comparison Operators
-
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `EQ` | Equal | `EntityType EQ NormalEntity` |
-| `NEQ` | Not equal | `EntityType NEQ MicroEntity` |
-| `LT` | Less than | `ClaimCount LT 10` |
-| `LTE` | Less than or equal | `ClaimCount LTE 20` |
-| `GT` | Greater than | `ClaimCount GT 10` |
-| `GTE` | Greater than or equal | `ClaimCount GTE 5` |
-| `IN` | Is in list | `Country IN DesignatedCountries` |
-| `NIN` | Not in list | `Country NIN ExcludedCountries` |
-
----
-
-### Logical Operators
-
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `AND` | Logical AND | `ClaimCount GT 10 AND EntityType EQ NormalEntity` |
-| `OR` | Logical OR | `EntityType EQ SmallEntity OR EntityType EQ MicroEntity` |
-
-**Example:**
-```
-YIELD 1000 IF ClaimCount GT 20 AND EntityType EQ NormalEntity
-YIELD 500 IF ClaimCount GT 20 AND (EntityType EQ SmallEntity OR EntityType EQ MicroEntity)
-```
-
----
-
-### Built-in Functions
-
-| Function | Description | Example |
-|----------|-------------|---------|
-| `ROUND(x)` | Round to nearest integer | `ROUND(Fee / 10) * 10` |
-| `FLOOR(x)` | Round down | `FLOOR(YearsSinceFiling)` |
-| `CEIL(x)` | Round up | `CEIL(MonthsRemaining / 12)` |
-
-**Example:**
-```
-LET Years AS FLOOR(FilingDate!YEARSTONOW)
-YIELD 100 * Years
-```
-
----
-
-### Currency Literals
-
-*(Currency-Aware Feature)*
-
-Annotate numeric values with ISO 4217 currency codes.
-
-**Syntax:**
-```
-<Number><<CurrencyCode>>
-```
-
-**Examples:**
-```
-100<EUR>      # 100 Euros
-50.50<USD>    # 50.50 US Dollars
-1000<GBP>     # 1000 British Pounds
-250<JPY>      # 250 Japanese Yen
-```
-
-**Type-safe arithmetic:**
-```
-# Valid: same currency
-YIELD 100<EUR> + 50<EUR>           # Result: 150 EUR
-YIELD 100<EUR> * 2                 # Result: 200 EUR (scalar multiplication)
-
-# Invalid: mixed currencies (compile-time error)
-YIELD 100<EUR> + 50<USD>           # TYPE ERROR: Cannot mix EUR and USD
-```
-
----
-
-### Currency Conversion
-
-*(Currency-Aware Feature)*
-
-Convert between currencies at runtime using exchange rates.
-
-**Syntax:**
-```
-CONVERT(<Amount>, <SourceCurrency>, <TargetCurrency>)
-```
-
-**Example:**
-```
-# Convert USD amount to EUR
-YIELD CONVERT(100<USD>, USD, EUR) + 50<EUR>
-
-# Convert an amount variable
-YIELD CONVERT(TranslationCost, USD, EUR) + PriorArtSearchFee
-```
-
----
-
-## Returns
-
-Define named outputs from the calculation.
-
-**Syntax:**
-```
-RETURN <Symbol> AS '<Display Text>'
-```
-
-**Example:**
-```
-RETURN TotalMandatory AS 'Total mandatory fees'
-RETURN TotalOptional AS 'Total optional fees'
-RETURN GrandTotal AS 'Grand total'
-```
+The child inherits everything from the parent—inputs, fees, verifications—and adds its own elements. You can also override inherited fees by redefining them with the same name.
+
+This composition approach offers substantial benefits:
+- **Code Reuse**: Share 60-80% of definitions across related jurisdictions
+- **Maintenance**: Update base fees once, changes flow to all children automatically
+- **Consistency**: Ensure related jurisdictions use compatible structures
+- **Auditability**: Track exactly which jurisdiction contributed each fee
 
 ---
 
 ## Complete Example
+
+Let's bring everything together with a complete European Patent Office fee calculator:
 
 ```
 # ===========================================
@@ -956,9 +844,13 @@ RETURN Examination AS 'Examination Fees'
 RETURN Total AS 'Total Fees'
 ```
 
+This example demonstrates most of IPFLang's core features: versioning, groups for organization, multiple input types, conditional fee logic with CASE blocks, local variables, currency-aware amounts, and named returns. It's production-ready code that clearly expresses complex fee calculations.
+
 ---
 
-## ISO 4217 Currency Codes (Common)
+## ISO 4217 Currency Codes
+
+IPFLang supports all 161 ISO 4217 currency codes. Here are the most commonly used ones:
 
 | Code | Currency |
 |------|----------|
@@ -978,83 +870,11 @@ RETURN Total AS 'Total Fees'
 | DKK | Danish Krone |
 | NOK | Norwegian Krone |
 
-IPFLang supports all 161 ISO 4217 currency codes.
-
----
-
-## Verification Directives
-
-IPFLang includes static analysis to verify fee correctness at compile time.
-
-### VERIFY COMPLETE
-
-Verify that a fee covers all possible input combinations (no gaps).
-
-**Syntax:**
-```
-VERIFY COMPLETE FEE <FeeName>
-```
-
-**Example:**
-```
-DEFINE LIST EntityType AS 'Entity type'
-CHOICE Normal AS 'Normal'
-CHOICE Small AS 'Small'
-DEFAULT Normal
-ENDDEFINE
-
-COMPUTE FEE BasicFee
-YIELD 100 IF EntityType EQ Normal
-YIELD 50 IF EntityType EQ Small
-ENDCOMPUTE
-
-VERIFY COMPLETE FEE BasicFee  # Verifies all EntityType values are covered
-```
-
-If the fee is incomplete (e.g., missing a case for one EntityType), the verification will report the gap.
-
----
-
-### VERIFY MONOTONIC
-
-Verify that a fee is monotonic with respect to a numeric input (e.g., more claims never reduces the fee).
-
-**Syntax:**
-```
-VERIFY MONOTONIC FEE <FeeName> WITH RESPECT TO <InputName>
-VERIFY MONOTONIC FEE <FeeName> WITH RESPECT TO <InputName> DIRECTION <Direction>
-```
-
-**Direction options:**
-- `NonDecreasing` (default) - Fee never decreases as input increases
-- `NonIncreasing` - Fee never increases as input increases
-- `StrictlyIncreasing` - Fee always increases as input increases
-- `StrictlyDecreasing` - Fee always decreases as input increases
-
-**Example:**
-```
-DEFINE NUMBER ClaimCount AS 'Number of claims'
-BETWEEN 1 AND 100
-DEFAULT 10
-ENDDEFINE
-
-COMPUTE FEE ClaimFee
-LET ExcessClaims AS ClaimCount - 10
-YIELD 50 * ExcessClaims IF ExcessClaims GT 0
-YIELD 0 IF ExcessClaims LTE 0
-ENDCOMPUTE
-
-VERIFY MONOTONIC FEE ClaimFee WITH RESPECT TO ClaimCount
-VERIFY MONOTONIC FEE ClaimFee WITH RESPECT TO ClaimCount DIRECTION NonDecreasing
-```
-
-If the fee violates monotonicity (e.g., fee decreases when ClaimCount increases), the verification will report the violation with specific values.
-
 ---
 
 ## Type System Summary
 
-The currency-aware type system prevents common errors:
+The currency-aware type system prevents common errors at compile time:
 
 | Expression | Valid? | Reason |
 |------------|--------|--------|
@@ -1065,4 +885,4 @@ The currency-aware type system prevents common errors:
 | `100<EUR> + 50` | ✓ | Plain number compatible |
 | `CONVERT(x, USD, EUR) + 50<EUR>` | ✓ | Explicit conversion |
 
-Type errors are reported at parse time, before any computation runs.
+Type errors are caught at parse time, long before any calculation runs. This makes IPFLang particularly robust for financial applications where currency mistakes can have serious consequences.
