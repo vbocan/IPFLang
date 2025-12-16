@@ -1153,39 +1153,39 @@ The open-source implementation is available at https://github.com/vbocan/IPFLang
 
 ## References
 
-[1] United States Patent and Trademark Office. (2025). USPTO Fee Schedule. https://www.uspto.gov/learning-and-resources/fees-and-payment/uspto-fee-schedule
+[1] United States Patent and Trademark Office, 2025. USPTO Fee Schedule. https://www.uspto.gov/learning-and-resources/fees-and-payment/uspto-fee-schedule (accessed 15 December 2024).
 
-[2] European Patent Office. (2024). EPO Schedule of Fees. https://my.epoline.org/epoline-portal/classic/epoline.Scheduleoffees
+[2] European Patent Office, 2024. EPO Schedule of Fees. https://my.epoline.org/epoline-portal/classic/epoline.Scheduleoffees (accessed 15 December 2024).
 
-[3] Japan Patent Office. (2024). JPO Fee Information. https://www.jpo.go.jp/
+[3] Japan Patent Office, 2024. JPO Fee Information. https://www.jpo.go.jp/ (accessed 15 December 2024).
 
-[4] World Intellectual Property Organization. (2024). WIPO PCT Fee Tables. https://www.wipo.int/
+[4] World Intellectual Property Organization, 2024. WIPO PCT Fee Tables. https://www.wipo.int/ (accessed 15 December 2024).
 
-[5] CPA Global (Clarivate). (2024). IP Management Solutions. https://www.cpaglobal.com/
+[5] CPA Global (Clarivate), 2024. IP Management Solutions. https://www.cpaglobal.com/ (accessed 15 December 2024).
 
-[6] Athan, T., Boley, H., Governatori, G., Palmirani, M., Paschke, A., & Wyner, A. (2015). LegalRuleML: Design Principles and Foundations. In Reasoning Web. Web Logic Rules (pp. 151-188). Springer, Cham. https://doi.org/10.1007/978-3-319-21768-0_6
+[6] T. Athan, H. Boley, G. Governatori, M. Palmirani, A. Paschke, A. Wyner, LegalRuleML: Design Principles and Foundations, in: Reasoning Web. Web Logic Rules, Springer, Cham, 2015, pp. 151–188. https://doi.org/10.1007/978-3-319-21768-0_6.
 
-[7] Merigoux, D., Chataing, N., & Protzenko, J. (2021). Catala: A Programming Language for the Law. Proceedings of the ACM on Programming Languages, 5(ICFP), Article 77. https://doi.org/10.1145/3473582
+[7] D. Merigoux, N. Chataing, J. Protzenko, Catala: A Programming Language for the Law, Proc. ACM Program. Lang. 5 (ICFP) (2021) Article 77. https://doi.org/10.1145/3473582.
 
-[8] World Intellectual Property Organization. (2023). WIPO ST.96 - Processing of IP Information using XML. https://www.wipo.int/standards/en/st96.html
+[8] World Intellectual Property Organization, 2023. WIPO ST.96 - Processing of IP Information using XML. https://www.wipo.int/standards/en/st96.html (accessed 15 December 2024).
 
-[9] European Patent Office. (2024). EPO Open Patent Services (OPS) API. https://www.epo.org/searching-for-patents/data/web-services/ops.html
+[9] European Patent Office, 2024. EPO Open Patent Services (OPS) API. https://www.epo.org/searching-for-patents/data/web-services/ops.html (accessed 15 December 2024).
 
-[10] Hvitved, T. (2011). Contract Formalisation and Modular Implementation of Domain-Specific Languages. PhD Thesis, University of Copenhagen.
+[10] T. Hvitved, Contract Formalisation and Modular Implementation of Domain-Specific Languages, PhD Thesis, University of Copenhagen, Denmark, 2011.
 
-[11] Kennedy, A. (2010). Types for Units-of-Measure: Theory and Practice. In Central European Functional Programming School (CEFP 2009) (pp. 268-305). Springer. https://doi.org/10.1007/978-3-642-17685-2_8
+[11] A. Kennedy, Types for Units-of-Measure: Theory and Practice, in: Central European Functional Programming School (CEFP 2009), Springer, 2010, pp. 268–305. https://doi.org/10.1007/978-3-642-17685-2_8.
 
-[12] OpenFisca Contributors. (2024). OpenFisca: Open-source platform for tax-benefit microsimulation. https://openfisca.org/
+[12] OpenFisca Contributors, 2024. OpenFisca: Open-source platform for tax-benefit microsimulation. https://openfisca.org/ (accessed 15 December 2024).
 
-[13] Red Hat. (2024). Drools Business Rules Management System. https://www.drools.org/
+[13] Red Hat, 2024. Drools Business Rules Management System. https://www.drools.org/ (accessed 15 December 2024).
 
-[14] New Zealand Government. (2018). Better Rules for Government Discovery Report. https://www.digital.govt.nz/dmsdocument/95-better-rules-for-government-discovery-report/html
+[14] New Zealand Government, 2018. Better Rules for Government Discovery Report. https://www.digital.govt.nz/dmsdocument/95-better-rules-for-government-discovery-report/html (accessed 15 December 2024).
 
-[15] Waddington, M. (2020). Rules as Code. IEEE IT Professional, 22(3), 14-19.
+[15] M. Waddington, Rules as Code, IEEE IT Prof. 22 (3) (2020) 14–19.
 
-[16] Fowler, M. (2010). Domain-Specific Languages. Addison-Wesley. ISBN: 978-0321712943
+[16] M. Fowler, Domain-Specific Languages, Addison-Wesley, Boston, 2010.
 
-[17] Aho, A. V., Lam, M. S., Sethi, R., & Ullman, J. D. (2006). Compilers: Principles, Techniques, and Tools (2nd ed.). Addison-Wesley. ISBN: 978-0321486814
+[17] A.V. Aho, M.S. Lam, R. Sethi, J.D. Ullman, Compilers: Principles, Techniques, and Tools, second ed., Addison-Wesley, Boston, 2006.
 
 ---
 
