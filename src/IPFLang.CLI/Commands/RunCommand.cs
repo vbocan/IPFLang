@@ -87,7 +87,7 @@ public class RunCommand : Command<RunCommand.Settings>
         else
         {
             var (mandatory, optional, steps, returns) = calculator.Compute(inputValues);
-            DisplayComputationResults(mandatory, optional, steps, returns);
+            DisplayComputationResults(mandatory, optional, steps, returns, string.IsNullOrEmpty(settings.InputsFile));
         }
 
         return 0;
@@ -263,7 +263,7 @@ public class RunCommand : Command<RunCommand.Settings>
         };
     }
 
-    private void DisplayComputationResults(decimal mandatory, decimal optional, IEnumerable<string> steps, IEnumerable<(string, string)> returns)
+    private void DisplayComputationResults(decimal mandatory, decimal optional, IEnumerable<string> steps, IEnumerable<(string, string)> returns, bool isInteractive)
     {
         AnsiConsole.MarkupLine("[blue]Computation Results:[/]");
         AnsiConsole.WriteLine();
@@ -293,7 +293,7 @@ public class RunCommand : Command<RunCommand.Settings>
 
         // Show computation steps in a panel
         AnsiConsole.WriteLine();
-        if (AnsiConsole.Confirm("Show detailed computation steps?", false))
+        if (isInteractive && AnsiConsole.Confirm("Show detailed computation steps?", false))
         {
             AnsiConsole.WriteLine();
             var escapedSteps = steps.Select(s => Markup.Escape(s));
