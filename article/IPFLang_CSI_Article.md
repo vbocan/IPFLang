@@ -1205,6 +1205,18 @@ The IPFLang reference implementation, including all example files and test suite
 
 ---
 
+## Funding
+
+This research did not receive any specific grant from funding agencies in the public, commercial, or not-for-profit sectors.
+
+---
+
+## CRediT Author Contribution Statement
+
+**Valer Bocan:** Conceptualization, Methodology, Software, Validation, Formal analysis, Investigation, Resources, Data curation, Writing - original draft, Writing - review & editing, Visualization, Supervision, Project administration.
+
+---
+
 ## Declaration of Competing Interests
 
 The author declares no competing interests. IPFLang is released as open-source software with no commercial affiliations.
