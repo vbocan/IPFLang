@@ -1,10 +1,12 @@
-# Run jurisdictions script
-# Presents groups from jurisdictions\bases, lets user select jurisdictions and runs compose with empty inputs
+# Run jurisdictions script (moved to jurisdictions_definitions)
+# Presents groups from the local bases folder, lets user select jurisdictions and runs compose with empty inputs
 
-$repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$baseDir = Join-Path $repoRoot 'jurisdictions\bases'
-$jurDir = Join-Path $repoRoot 'jurisdictions\jurisdictions'
-$inputsFile = Join-Path $repoRoot 'jurisdictions\empty_inputs.json'
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$repoRoot = Split-Path -Parent $scriptDir
+$baseDir = Join-Path $scriptDir 'bases'
+$jurDir = Join-Path $scriptDir 'jurisdictions'
+$inputsFile = Join-Path $scriptDir 'empty_inputs.json'
+$projectPath = Join-Path $repoRoot 'src\IPFLang.CLI'
 
 if (-not (Test-Path $baseDir)) { Write-Error "Bases folder not found: $baseDir"; exit 1 }
 if (-not (Test-Path $jurDir)) { Write-Error "Jurisdictions folder not found: $jurDir"; exit 1 }
@@ -67,8 +69,8 @@ switch ($mode.ToUpper()) {
 }
 
 foreach ($jur in $jurFiles) {
-    Write-Host "`n========== Running: $($jur.Name) (composed with $(Split-Path $selectedBase -Leaf)) =========="
-    $args = @('run','--project','src\IPFLang.CLI','--','compose', $selectedBase, $jur.FullName)
+    Write-Host "`n========== Running: $($jur.Name) (composed with $selectedBaseName) =========="
+    $args = @('run','--project',$projectPath,'--','compose', $selectedBase, $jur.FullName)
     if (Test-Path $inputsFile) { $args += @('--inputs', $inputsFile) }
     if ($provFlag.Count -gt 0) { $args += $provFlag }
 
