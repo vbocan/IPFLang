@@ -1192,6 +1192,10 @@ The open-source implementation is available at https://github.com/vbocan/IPFLang
 
 ---
 
+## Acknowledgments
+
+The author gratefully acknowledges Robert Fichter, Ph.D. of Jet IP for his meticulous verification of each jurisdiction implementation in IPFLang, ensuring dollar-accurate calculations across all supported patent offices. Special thanks to Adrian Ivan, M.Sc., of Storya Soft for comprehensive end-to-end application testing, and to Cătălin Bălășcuță for his valuable contributions in implementing recurring fee calculation patterns and supporting Fichter's validation work.
+
 ## Data Availability Statement
 
 The IPFLang reference implementation, including all example files and test suite, is available under GPLv3 at https://github.com/vbocan/IPFLang.
