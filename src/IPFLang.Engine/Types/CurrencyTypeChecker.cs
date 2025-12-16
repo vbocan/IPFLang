@@ -12,6 +12,7 @@ namespace IPFLang.Types
         private static readonly Regex CurrencyLiteralPattern = new(@"^(-?\d+(?:\.\d+)?)<([A-Z]{3})>$", RegexOptions.Compiled);
         private static readonly Regex ConvertPattern = new(@"^CONVERT$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly HashSet<string> ArithmeticOperators = new() { "+", "-", "*", "/" };
+        private static readonly HashSet<string> NumericFunctions = new(StringComparer.OrdinalIgnoreCase) { "CEIL", "FLOOR", "ROUND" };
         private static readonly HashSet<string> ComparisonOperators = new() { "EQ", "NEQ", "GT", "GTE", "LT", "LTE", "IN", "NIN" };
         private static readonly HashSet<string> LogicalOperators = new() { "AND", "OR", "NOT" };
 
@@ -196,6 +197,12 @@ namespace IPFLang.Types
                 return InferConvertType(tokens, env, context);
             }
 
+            // Check for numeric functions: CEIL ( expr ), FLOOR ( expr ), ROUND ( expr )
+            if (tokens.Count >= 4 && NumericFunctions.Contains(tokens[0]) && tokens[1] == "(")
+            {
+                return InferNumericFunctionType(tokens, env, context);
+            }
+
             // Single token
             if (tokens.Count == 1)
             {
@@ -269,6 +276,65 @@ namespace IPFLang.Types
                 _errors.Add(TypeError.InvalidCurrency(targetCurrency, context));
                 return new IPFTypeError($"Invalid currency: {targetCurrency}");
             }
+        }
+
+        /// <summary>
+        /// Infer type of numeric function call (CEIL, FLOOR, ROUND)
+        /// These functions take a numeric argument and return a number.
+        /// </summary>
+        private IPFType InferNumericFunctionType(List<string> tokens, TypeEnvironment env, string context)
+        {
+            // Pattern: FUNCTION ( expr )
+            // Find matching close paren
+            int parenDepth = 0;
+            int closeParenIndex = -1;
+
+            for (int i = 1; i < tokens.Count; i++)
+            {
+                if (tokens[i] == "(") parenDepth++;
+                else if (tokens[i] == ")")
+                {
+                    parenDepth--;
+                    if (parenDepth == 0)
+                    {
+                        closeParenIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (closeParenIndex < 0)
+            {
+                _errors.Add(new TypeError(TypeErrorKind.TypeMismatch, $"{tokens[0]} requires closing parenthesis", context));
+                return new IPFTypeError($"Invalid {tokens[0]} syntax");
+            }
+
+            // Extract and type-check the argument expression
+            var argTokens = tokens.Skip(2).Take(closeParenIndex - 2).ToList();
+            var argType = InferExpressionType(argTokens, env, context);
+
+            // Argument must be numeric
+            if (argType is not (IPFTypeNumber or IPFTypeAmount or IPFTypeVariable))
+            {
+                _errors.Add(TypeError.ArithmeticOnNonNumeric(argType, $"{tokens[0]} argument"));
+            }
+
+            // If there are tokens after the function call, it's part of a larger expression
+            if (closeParenIndex < tokens.Count - 1)
+            {
+                // Reconstruct expression: treat function result as number, combine with remaining tokens
+                var remainingTokens = new List<string> { "__FUNC_RESULT__" };
+                remainingTokens.AddRange(tokens.Skip(closeParenIndex + 1));
+
+                // Temporarily bind the function result as a number
+                var tempEnv = env.NewScope();
+                tempEnv.Bind("__FUNC_RESULT__", new IPFTypeNumber());
+
+                return InferExpressionType(remainingTokens, tempEnv, context);
+            }
+
+            // CEIL, FLOOR, ROUND always return a number
+            return new IPFTypeNumber();
         }
 
         /// <summary>
