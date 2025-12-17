@@ -40,11 +40,11 @@ Equally problematic is the complete absence of programmatic interfaces for fee c
 
 The situation is further complicated by the proprietary nature of calculation logic itself. Fee computation rules remain embedded in server-side code, entirely inaccessible to practitioners who must verify accuracy against frequently-updated official fee schedules. When discrepancies arise between calculated and actual fees, practitioners find themselves unable to diagnose whether errors stem from incorrect inputs or flawed calculation logic, as the underlying implementation remains opaque.
 
-Commercial IP management platforms from vendors such as CPA Global, Anaqua, and PatSnap address some workflow needs but perpetuate fragmentation through vendor-specific implementations, limited jurisdiction coverage, and hardcoded fee structures requiring vendor patches for regulatory updates [5]. The global IP management software market operates without standardized interfaces, forcing enterprises into vendor lock-in and limiting interoperability between best-of-breed solutions.
+Commercial IP management platforms from vendors such as CPA Global, Anaqua, and PatSnap address some workflow needs but perpetuate fragmentation through vendor-specific implementations, limited jurisdiction coverage, and hardcoded fee structures requiring vendor patches for regulatory updates [5]. The global IP management software market operates without standardized interfaces, forcing enterprises into vendor lock-in and limiting interoperability between best-of-breed solutions. Research on de facto technical standards has documented how network effects and single-vendor control in IT ecosystems create barriers to interoperability and innovation [18], patterns that characterize the current IP technology landscape.
 
 ### 1.2 The Need for Standardization
 
-Successful technology domains achieve interoperability through open standards. SQL standardized database queries through ISO/IEC 9075, HTML standardized web content through W3C specifications, and XML Schema standardized data validation under the same organization. These standards enabled ecosystem growth by separating interface specifications from implementations, allowing multiple vendors to provide interoperable solutions.
+Successful technology domains achieve interoperability through open standards. SQL standardized database queries through ISO/IEC 9075, HTML standardized web content through W3C specifications, and XML Schema standardized data validation under the same organization. These standards enabled ecosystem growth by separating interface specifications from implementations, allowing multiple vendors to provide interoperable solutions. Research on intellectual property disclosure in standards development has examined how standards organizations balance IP rights with interoperability requirements [19], highlighting the complex dynamics that any IP technology standardization effort must navigate.
 
 The IP technology domain lacks equivalent standards for fee calculation, resulting in three critical gaps. The first is a specification gap: no standard language exists for expressing jurisdiction-specific fee rules. LegalRuleML [6] addresses compliance checking but lacks arithmetic expressiveness for financial calculations. Catala [7] demonstrates sophisticated tax calculations but targets single-jurisdiction applications requiring formal methods expertise unsuitable for legal practitioners. The second gap concerns formal verification: existing calculators provide no guarantees that fee definitions cover all valid input combinations or behave predictably as inputs change. The third gap is one of transparency: proprietary implementations prevent independent verification of calculation correctness.
 
@@ -94,7 +94,7 @@ Catala, created by Merigoux et al. [7], represents a programming language specif
 
 Contract-oriented DSLs [10] focus on party obligations, temporal constraints, and conditional execution semantics. Monetary aspects receive minimal treatment, with basic arithmetic operations but lacking multi-currency precision, exchange rate management, and historical rate tracking required for cross-border IP portfolios.
 
-The concept of encoding units in type systems originates with Kennedy's dimensional types [11], which prevent unit mismatch errors in scientific computing. IPFLang applies similar principles to currency, extending the concept with explicit conversion operators and polymorphic type variables for generic fee definitions.
+The concept of encoding units in type systems originates with Kennedy's dimensional types [11], which prevent unit mismatch errors in scientific computing. IPFLang applies similar principles to currency, extending the concept with explicit conversion operators and polymorphic type variables for generic fee definitions. Recent work on graded modal types [20] demonstrates how type systems can track quantitative resource usage, providing theoretical foundations for systems that reason about resource consumption—a concept related to IPFLang's tracking of monetary values across fee computations.
 
 OpenFisca [12] provides a Python-based platform for tax-benefit microsimulation, used by governments including France and New Zealand. While powerful, OpenFisca requires Python programming expertise and targets general fiscal policy rather than the specific requirements of IP fee calculation.
 
@@ -106,7 +106,7 @@ Automated compliance checking represents a related domain where technology assis
 
 Business Rules Management Systems such as Drools [13] provide general-purpose rules engines using production rules with Rete algorithm inference. These systems require substantial technical expertise, lack domain-specific abstractions for legal concepts, and impose expensive enterprise licensing. While powerful, BRMS platforms are fundamentally over-engineered for deterministic fee calculations.
 
-Some governments have begun pursuing rules-as-code initiatives that encode regulations in executable formats [14, 15]. New Zealand's "Better Rules" program and similar initiatives in Australia and France explore machine-consumable legislation. These initiatives typically use general-purpose languages rather than domain-specific languages, limiting accessibility to legal experts who must rely on programmers for implementation.
+Some governments have begun pursuing rules-as-code initiatives that encode regulations in executable formats [14, 15]. New Zealand's "Better Rules" program and similar initiatives in Australia and France explore machine-consumable legislation. The OECD has documented the international scope of these efforts, providing frameworks for encoding rules in machine-readable formats that emphasize transparency and regulatory automation [21]. More recent policy analysis explores how rules-as-code approaches can enable more efficient global economic governance, including applications to international trade regulations and intellectual property [22]. These initiatives typically use general-purpose languages rather than domain-specific languages, limiting accessibility to legal experts who must rely on programmers for implementation.
 
 **[INSERT FIGURE 1: figures/figure1_dsl_comparison.mmd - Comparison of Legal DSLs and Rules Engines]**
 
@@ -127,7 +127,7 @@ Table 1 provides a systematic comparison of IPFLang with related approaches.
 
 *Table 1: Comparison of Legal DSLs and Rules Engines*
 
-IPFLang differentiates itself through the combination of domain-specific syntax designed for readability, first-class multi-currency type safety with all 161 ISO 4217 currencies as built-in primitives, static verification of completeness and monotonicity, and explicit support for multi-jurisdiction fee structures with inheritance and composition. While languages like Catala could theoretically support currency types through user-defined abstractions, IPFLang provides these as language primitives requiring no additional implementation effort.
+IPFLang differentiates itself through the combination of domain-specific syntax designed for readability, first-class multi-currency type safety with all 161 ISO 4217 currencies as built-in primitives, static verification of completeness and monotonicity, and explicit support for multi-jurisdiction fee structures with inheritance and composition. While languages like Catala could theoretically support currency types through user-defined abstractions, IPFLang provides these as language primitives requiring no additional implementation effort. The design follows established principles for DSL development that emphasize matching language constructs to domain concepts [23].
 
 ---
 
@@ -470,7 +470,7 @@ A bare `<identifier>` in a condition context must reference a BOOLEAN input vari
 
 ### 4.1 Currency-Aware Type System
 
-IPFLang employs a dimensional type system preventing cross-currency arithmetic errors at compile time, analogous to units-of-measure checking in scientific computing [11]. The system supports all 161 ISO 4217 currency codes.
+IPFLang employs a dimensional type system preventing cross-currency arithmetic errors at compile time, analogous to units-of-measure checking in scientific computing [11]. The system supports all 161 ISO 4217 currency codes. The approach to currency as a type parameter draws on similar patterns in language standards for monetary computation, such as JSR-354 (Java Money and Currency API) [24], which defines standard interfaces for representing and manipulating monetary amounts in type-safe ways.
 
 #### 4.1.1 Type Language
 
@@ -825,7 +825,7 @@ For Boolean domains, sampling includes both TRUE and FALSE exhaustively. For LIS
 
 **Proposition 2 (Completeness of Exhaustive Mode).** If a gap exists, the exhaustive algorithm will find it (up to MAX_GAPS reporting limit).
 
-**Remark (Boundary-Based Testing Limitations).** The boundary-based testing mode may produce false negatives (miss gaps that fall between sampled points). It is designed to maximize gap detection for common fee patterns by prioritizing boundary values, threshold values extracted from conditions, and representative samples. **This mode does not provide formal guarantees**; users requiring provable completeness should ensure domain sizes permit exhaustive verification or employ manual analysis.
+**Remark (Boundary-Based Testing Limitations).** The boundary-based testing mode may produce false negatives (miss gaps that fall between sampled points). It is designed to maximize gap detection for common fee patterns by prioritizing boundary values, threshold values extracted from conditions, and representative samples. **This mode does not provide formal guarantees**; users requiring provable completeness should ensure domain sizes permit exhaustive verification or employ manual analysis. The distinction between exhaustive verification with formal guarantees and heuristic sampling reflects fundamental tradeoffs in static analysis between precision and scalability [25].
 
 **Example - Gap Detection:**
 ```
@@ -887,7 +887,7 @@ Output: (monotonic: Bool, violations: List⟨Violation⟩)
 
 where Violates(p, c, d) returns true if and only if: d = NonDecreasing and c < p; d = NonIncreasing and c > p; d = StrictlyIncreasing and c ≤ p; or d = StrictlyDecreasing and c ≥ p.
 
-**Remark (Currency Comparison).** Monotonicity verification compares fee values numerically. When f returns Amt[c], comparison uses the underlying numeric value; currency tags must match (guaranteed by type safety).
+**Remark (Currency Comparison).** Monotonicity verification compares fee values numerically. When f returns Amt[c], comparison uses the underlying numeric value; currency tags must match (guaranteed by type safety). Recent work on verification-preserving program transformations [26] demonstrates techniques for ensuring that program properties are maintained across transformations, providing theoretical foundations relevant to IPFLang's verification approach.
 
 **Example:**
 ```
@@ -1059,7 +1059,7 @@ All 260 tests pass with 100% success rate. Test execution completes in sub-milli
 
 **External Validity.** The 118 production jurisdiction files in `jurisdictions/` covering PCT national/regional phase entry for major patent offices were validated by a domain expert (Robert Fichter, Ph.D.) against official PCT fee schedules. The validation confirmed dollar-accurate calculations across all supported jurisdictions. The test suite includes synthetic fee schedule models for USPTO and EPO that demonstrate the language's expressiveness for complex fee structures, though these use representative values rather than tracking current official schedules which are updated annually.
 
-**Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
+**Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16, 23] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
 
 **Reliability.** Results are reproducible via the open-source implementation. The validation test cases can be independently verified against official fee schedule documents. Exchange rate-dependent calculations (not present in the current examples) would introduce temporal variation.
 
@@ -1095,7 +1095,7 @@ A domain suitability assessment suggests high applicability to professional lice
 
 Several limitations constrain the current work. Regarding implementation scope, the reference implementation provides only a CLI interface; REST API support would enable broader integration with existing IP management workflows. In terms of jurisdiction coverage, while the repository includes 118 production jurisdiction files covering PCT national/regional phase entry for major patent offices (validated by a domain expert against official PCT fee schedules), extension to cover additional fee types (annuities, oppositions, appeals) remains important future work.
 
-The type system expressiveness is constrained in that it does not support dependent types or refinement types that could express additional invariants such as requiring claim counts to be positive. A significant limitation concerns empirical validation of readability: user studies validating syntax readability for domain experts have not been conducted, and design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16] rather than empirical evidence. This constitutes a gap that future work must address.
+The type system expressiveness is constrained in that it does not support dependent types or refinement types that could express additional invariants such as requiring claim counts to be positive. A significant limitation concerns empirical validation of readability: user studies validating syntax readability for domain experts have not been conducted, and design decisions favoring readability (keyword operators, explicit block delimiters) are based on DSL design principles [16, 23] rather than empirical evidence. This constitutes a gap that future work must address.
 
 Finally, boundary-based testing has inherent limitations. For large input domains exceeding the exhaustive verification threshold (10⁶ combinations), the boundary-based testing mode may miss gaps between sampled points. Users requiring formal completeness guarantees must either constrain domain sizes or employ complementary analysis techniques.
 
@@ -1158,6 +1158,24 @@ The open-source implementation is available at https://github.com/vbocan/IPFLang
 [16] M. Fowler, Domain-Specific Languages, Addison-Wesley, Boston, 2010.
 
 [17] A.V. Aho, M.S. Lam, R. Sethi, J.D. Ullman, Compilers: Principles, Techniques, and Tools, second ed., Addison-Wesley, Boston, 2006.
+
+[18] C.V. Chien, Holding Up and Holding Out, Michigan Telecommunications and Technology Law Review 21 (1) (2014) 1–44.
+
+[19] R. Bekkers, A. Updegrove, A Study of IPR Policies and Practices of a Representative Group of Standards Setting Organizations Worldwide, in: Proc. National Academies Symposium on Intellectual Property Rights, National Research Council, Washington, DC, 2012.
+
+[20] D. Orchard, V.-B. Liepelt, H. Eades III, Quantitative Program Reasoning with Graded Modal Types, Proc. ACM Program. Lang. 3 (ICFP) (2019) Article 110. https://doi.org/10.1145/3341714.
+
+[21] J. Mohun, A. Roberts, Cracking the Code: Rulemaking for Humans and Machines, OECD Working Papers on Public Governance, No. 42, OECD Publishing, Paris, 2020. https://doi.org/10.1787/3afe6ba5-en.
+
+[22] D. Rapson, J. Sheridan, J. Mohun, A. Roberts, Rules as Code for a More Transparent and Efficient Global Economy, Centre for International Governance Innovation (CIGI), Policy Brief No. 187, 2023.
+
+[23] M. Mernik, J. Heering, A.M. Sloane, When and How to Develop Domain-Specific Languages, ACM Comput. Surv. 37 (4) (2005) 316–344. https://doi.org/10.1145/1118890.1118892.
+
+[24] Java Community Process, JSR 354: Money and Currency API, Java Specification Request, 2015. https://jcp.org/en/jsr/detail?id=354 (accessed 15 December 2024).
+
+[25] P. Cousot, R. Cousot, Abstract Interpretation: A Unified Lattice Model for Static Analysis of Programs by Construction or Approximation of Fixpoints, in: Proc. 4th ACM SIGACT-SIGPLAN Symposium on Principles of Programming Languages (POPL), ACM, 1977, pp. 238–252. https://doi.org/10.1145/512950.512973.
+
+[26] T. Dardinier, G. Parthasarathy, P. Müller, Verification-Preserving Inlining in Automatic Separation Logic Verifiers, Proc. ACM Program. Lang. 7 (OOPSLA1) (2023) Article 80. https://doi.org/10.1145/3586054.
 
 ---
 
