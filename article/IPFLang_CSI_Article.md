@@ -151,6 +151,8 @@ The sixth principle guarantees jurisdiction independence. Language constructs ma
 
 ### 3.2 Language Syntax Overview
 
+**[INSERT FIGURE 2: figures/figure5_syntax_structure.mmd - IPFLang Program Structure]**
+
 IPFLang programs consist of several sections:
 
 ```
@@ -472,6 +474,8 @@ A bare `<identifier>` in a condition context must reference a BOOLEAN input vari
 
 IPFLang employs a dimensional type system preventing cross-currency arithmetic errors at compile time, analogous to units-of-measure checking in scientific computing [11]. The system supports all 161 ISO 4217 currency codes. The approach to currency as a type parameter draws on similar patterns in language standards for monetary computation, such as JSR-354 (Java Money and Currency API) [24], which defines standard interfaces for representing and manipulating monetary amounts in type-safe ways.
 
+**[INSERT FIGURE 3: figures/figure6_type_hierarchy.mmd - IPFLang Type Hierarchy and Currency Typing Rules]**
+
 #### 4.1.1 Type Language
 
 The type language extends basic types with currency-parameterized amounts:
@@ -775,7 +779,7 @@ IPFLang supports static analysis to determine whether fee computations produce d
 
 The completeness analysis employs two strategies depending on domain size:
 
-**[INSERT FIGURE 2: figures/figure2_completeness_algorithm.mmd - Completeness Analysis Algorithm Flowchart]**
+**[INSERT FIGURE 4: figures/figure2_completeness_algorithm.mmd - Completeness Analysis Algorithm Flowchart]**
 
 ```
 Algorithm 1: Completeness Analysis
@@ -843,6 +847,8 @@ Output: "Gap: {EntityType=Micro}" and "Gap: {ClaimCount ≤ 20}"
 
 Fee schedules should exhibit predictable behavior: increasing claim count should never decrease the fee.
 
+**[INSERT FIGURE 5: figures/figure7_monotonicity.mmd - Monotonicity Verification Process and Direction Types]**
+
 #### 4.3.1 Formal Definition
 
 **Definition 5 (Monotonicity).** Let f: Σ → ℝ be a fee function, x ∈ Vars a numeric input, and σ₋ₓ a partial valuation excluding x. Fee f is *non-decreasing* with respect to x if:
@@ -905,7 +911,7 @@ Each fee evaluation generates provenance records that comprehensively document t
 
 This trace enables practitioners to verify calculations against official schedules and assists in dispute resolution.
 
-**[INSERT FIGURE 3: figures/figure3_provenance_structure.mmd - Provenance Record Structure]**
+**[INSERT FIGURE 6: figures/figure3_provenance_structure.mmd - Provenance Record Structure]**
 
 ### 5.2 Counterfactual Analysis
 
@@ -928,7 +934,7 @@ This capability supports budget planning, client advisory, and regulatory impact
 
 ### 6.1 Architecture Overview
 
-**[INSERT FIGURE 4: figures/figure4_architecture.mmd - IPFLang Engine Architecture]**
+**[INSERT FIGURE 7: figures/figure4_architecture.mmd - IPFLang Engine Architecture]**
 
 The IPFLang reference implementation comprises approximately 15,000 lines of C# targeting .NET 10.0, organized into modular subsystems:
 
@@ -1010,6 +1016,8 @@ The complete source code is available at https://github.com/vbocan/IPFLang under
 ## 7. Evaluation
 
 ### 7.1 Representative Examples
+
+**[INSERT FIGURE 8: figures/figure8_jurisdiction_coverage.mmd - PCT National/Regional Phase Jurisdiction Coverage]**
 
 The implementation includes 20 IPFLang example files in the `examples/` directory demonstrating language expressiveness across diverse fee structure patterns, plus **118 production-ready jurisdiction files** in the `jurisdictions/` directory covering PCT national/regional phase entry fees for all major patent offices worldwide.
 
