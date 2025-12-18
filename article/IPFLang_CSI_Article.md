@@ -108,8 +108,6 @@ Business Rules Management Systems such as Drools [13] provide general-purpose ru
 
 Some governments have begun pursuing rules-as-code initiatives that encode regulations in executable formats [14, 15]. New Zealand's "Better Rules" program and similar initiatives in Australia and France explore machine-consumable legislation. The OECD has documented the international scope of these efforts, providing frameworks for encoding rules in machine-readable formats that emphasize transparency and regulatory automation [21]. More recent policy analysis explores how rules-as-code approaches can enable more efficient global economic governance, including applications to international trade regulations and intellectual property [22]. These initiatives typically use general-purpose languages rather than domain-specific languages, limiting accessibility to legal experts who must rely on programmers for implementation.
 
-**[INSERT FIGURE 1: figures/figure1_dsl_comparison.mmd - Comparison of Legal DSLs and Rules Engines]**
-
 Table 1 provides a systematic comparison of IPFLang with related approaches.
 
 | Feature | IPFLang | Catala | LegalRuleML | Drools | OpenFisca |
@@ -153,16 +151,7 @@ The sixth principle guarantees jurisdiction independence. Language constructs ma
 
 **[INSERT FIGURE 2: figures/figure5_syntax_structure.mmd - IPFLang Program Structure]**
 
-IPFLang programs consist of several sections:
-
-```
-[Version Declaration]     // Optional metadata
-[Group Definitions]       // Optional UI organization
-[Input Definitions]       // Required parameters
-[Fee Computations]        // Fee calculation logic
-[Verification Directives] // Optional static checks
-[Return Statements]       // Optional named outputs
-```
+An IPFLang program begins with an optional version declaration that establishes metadata including version identifier, effective date, and references to authoritative fee schedules. Following the version declaration, group definitions organize inputs into logical categories for user interface presentation, with weights determining display order. The core of any IPFLang program consists of input definitions that declare the parameters required for fee calculation—these may be single-choice enumerations (LIST), multi-choice selections (MULTILIST), numeric values with optional constraints (NUMBER), binary choices (BOOLEAN), temporal values (DATE), or currency-aware monetary inputs (AMOUNT). Fee computation blocks contain the actual calculation logic using conditional yields and case statements. Programs may include verification directives that enable static analysis of completeness and monotonicity properties. Finally, return statements provide named outputs for integration with external systems.
 
 ### 3.3 Version Declaration
 
@@ -295,10 +284,10 @@ The OPTIONAL keyword distinguishes fees that may or may not apply from mandatory
 **Example - EPO claim fees with progressive rates:**
 ```
 COMPUTE FEE ExcessClaimsFee
-LET ClaimFee1 AS 265
-LET ClaimFee2 AS 660
+LET ClaimFee1 AS 265<EUR>
+LET ClaimFee2 AS 660<EUR>
 CASE ClaimCount LTE 15 AS
-  YIELD 0
+  YIELD 0<EUR>
 ENDCASE
 CASE ClaimCount GT 15 AND ClaimCount LTE 50 AS
   YIELD ClaimFee1 * (ClaimCount - 15)
@@ -354,7 +343,7 @@ ENDCOMPUTE
 # Adds Germany-specific fee
 COMPUTE FEE GermanTranslationFee
 YIELD 1050<EUR> IF NeedsTranslation EQ TRUE
-YIELD 0 IF NeedsTranslation EQ FALSE
+YIELD 0<EUR> IF NeedsTranslation EQ FALSE
 ENDCOMPUTE
 ```
 
@@ -492,7 +481,7 @@ The type language extends basic types with currency-parameterized amounts:
     <mo>|</mo>
     <mi>Date</mi>
     <mo>|</mo>
-    <mi>StrList</mi>
+    <mi>SymList</mi>
     <mo>|</mo>
     <mi>Amt</mi><mo>[</mo><mi>c</mi><mo>]</mo>
     <mo>|</mo>
@@ -503,9 +492,9 @@ The type language extends basic types with currency-parameterized amounts:
 where:
 - `Num` represents dimensionless numbers
 - `Bool` represents Boolean values
-- `Sym` represents symbolic identifiers (LIST choices)
+- `Sym` represents symbolic identifiers (LIST input choices)
 - `Date` represents date values
-- `StrList` represents string lists (MULTILIST selections)
+- `SymList` represents symbol lists (MULTILIST input selections)
 - `Amt[c]` represents monetary amounts in currency c ∈ ISO-4217
 - `α` represents type variables for polymorphic fee definitions
 
@@ -834,8 +823,8 @@ For Boolean domains, sampling includes both TRUE and FALSE exhaustively. For LIS
 **Example - Gap Detection:**
 ```
 COMPUTE FEE ClaimFee
-  YIELD 100 * (ClaimCount - 20) IF EntityType EQ Large AND ClaimCount GT 20
-  YIELD 50 * (ClaimCount - 20) IF EntityType EQ Small AND ClaimCount GT 20
+  YIELD 100<EUR> * (ClaimCount - 20) IF EntityType EQ Large AND ClaimCount GT 20
+  YIELD 50<EUR> * (ClaimCount - 20) IF EntityType EQ Small AND ClaimCount GT 20
 ENDCOMPUTE
 
 VERIFY COMPLETE FEE ClaimFee
@@ -944,7 +933,7 @@ The IPFLang reference implementation comprises approximately 15,000 lines of C# 
 
 **Type System:** Currency-aware type checking with 161 ISO 4217 currencies, polymorphic type support, and detailed type error reporting.
 
-**Evaluator:** Depth-first AST traversal with environment binding, supporting expression memoization, short-circuit boolean evaluation, and constant folding.
+**Evaluator:** Depth-first AST traversal with environment binding for expression evaluation.
 
 **Analysis Module:** Completeness checker with exhaustive and sampling modes, monotonicity checker with four direction types, domain analyzer, and condition extractor.
 
@@ -1009,7 +998,7 @@ Total:             EUR 4,905.00
 
 ### 6.4 Source Code Availability
 
-The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes the complete DSL engine source (approximately 10,000 lines of C#), a comprehensive test suite (approximately 5,500 lines comprising 260 test methods across 18 test categories), 20 IPFLang example files in the `examples/` directory (approximately 1,900 lines of DSL code) demonstrating language features, 118 production jurisdiction files in the `jurisdictions/` directory covering PCT national/regional phase entry fees (approximately 11,800 lines of DSL code), and documentation with syntax reference.
+The complete source code is available at https://github.com/vbocan/IPFLang under the GNU General Public License v3.0 (GPLv3). The repository includes the complete DSL engine source (approximately 10,000 lines of C#), a comprehensive test suite (approximately 5,500 lines comprising 260 test methods across 18 test categories), 20 IPFLang example files in the `examples/` directory (approximately 1,700 lines of DSL code) demonstrating language features, 118 production jurisdiction files plus 4 regional base files in the `jurisdictions/` directory covering PCT national/regional phase entry fees (approximately 21,800 lines of DSL code), and documentation with syntax reference.
 
 ---
 
@@ -1027,11 +1016,11 @@ Feature demonstrations include currency type safety with mixed-currency error de
 
 Error detection examples cover mixed currency arithmetic (EUR + USD), incomplete fee coverage, non-monotonic fee behavior, invalid currency codes, and undefined variable references.
 
-The 118 production jurisdictions (validated by a domain expert against official PCT fee schedules) are organized hierarchically: 4 regional base files (EP, EA, AP, OA) defining common fee structures for European Patent, Eurasian Patent, ARIPO, and OAPI member states, and 118 jurisdiction-specific files (`PCT-XX.ipf` where XX is the ISO country code) that either stand alone or inherit from and extend their regional base. For example, `PCT-RO.ipf` (Romania) composes with `bases/base_ep.ipf` to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication across jurisdictions sharing common regional structures while allowing country-specific customizations.
+The 118 production jurisdictions (validated by a domain expert against official PCT fee schedules) are organized hierarchically: 4 regional base files (EP, EA, AP, OA) defining common fee structures for European Patent, Eurasian Patent, ARIPO, and OAPI member states, and 118 jurisdiction-specific files that either stand alone or inherit from and extend their regional base. For example, Romania composes with the EP base to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication across jurisdictions sharing common regional structures while allowing country-specific customizations.
 
 ### 7.2 Jurisdiction File Validation
 
-The 118 production jurisdiction files in the `jurisdictions/` directory were validated by a domain expert (Robert Fichter, Ph.D., Jet IP) against official PCT national/regional phase entry fee schedules from patent offices worldwide. The validation process verified dollar-accurate calculations across all supported jurisdictions covering the period 2023-2024.
+The 118 production jurisdiction files were validated by a domain expert against official PCT national/regional phase entry fee schedules from patent offices worldwide. The validation process verified dollar-accurate calculations across all supported jurisdictions covering the period 2023-2024.
 
 The jurisdiction files are organized hierarchically with 4 regional base files defining common fee structures:
 - **base_ep.ipf**: European Patent Convention member states (38 countries)
@@ -1039,9 +1028,9 @@ The jurisdiction files are organized hierarchically with 4 regional base files d
 - **base_ap.ipf**: African Regional Intellectual Property Organization (ARIPO) member states (19 countries)
 - **base_oa.ipf**: African Intellectual Property Organization (OAPI) member states (17 countries)
 
-Individual jurisdiction files (`PCT-XX.ipf` where XX is the ISO country code) either stand alone or inherit from and extend their regional base using the COMPOSE directive. For example, `PCT-RO.ipf` (Romania) composes with `bases/base_ep.ipf` to inherit EPO validation requirements while adding OSIM-specific national phase fees. This hierarchical organization eliminates duplication while allowing country-specific customizations.
+Individual jurisdiction files either stand alone or inherit from and extend their regional base using the COMPOSE directive.
 
-The test suite includes `RealWorldValidationTests.cs` with synthetic USPTO and EPO fee schedule models demonstrating the language's capability to represent complex, multi-tiered fee structures with entity-based discounts, excess claim calculations, and temporal versioning. These tests validate the DSL engine's computational correctness but use representative fee values rather than exact current schedules, as official fee schedules are updated annually and vary by jurisdiction.
+The test suite includes synthetic USPTO and EPO fee schedule models demonstrating the language's capability to represent complex, multi-tiered fee structures with entity-based discounts, excess claim calculations, and temporal versioning. These tests validate the DSL engine's computational correctness but use representative fee values rather than exact current schedules, as official fee schedules are updated annually and vary by jurisdiction.
 
 ### 7.3 Test Suite
 
@@ -1063,9 +1052,9 @@ All 260 tests pass with 100% success rate. Test execution completes in sub-milli
 
 ### 7.4 Threats to Validity
 
-**Internal Validity.** The test suite validates correctness of the implementation but may not cover all edge cases. The 266 tests focus on feature coverage rather than exhaustive input space exploration. The validation against official fee schedules covers representative scenarios but not all possible input combinations.
+**Internal Validity.** The test suite validates correctness of the implementation but may not cover all edge cases. The 260 tests focus on feature coverage rather than exhaustive input space exploration. The validation against official fee schedules covers representative scenarios but not all possible input combinations.
 
-**External Validity.** The 118 production jurisdiction files in `jurisdictions/` covering PCT national/regional phase entry for major patent offices were validated by a domain expert (Robert Fichter, Ph.D.) against official PCT fee schedules. The validation confirmed dollar-accurate calculations across all supported jurisdictions. The test suite includes synthetic fee schedule models for USPTO and EPO that demonstrate the language's expressiveness for complex fee structures, though these use representative values rather than tracking current official schedules which are updated annually.
+**External Validity.** The 118 production jurisdiction files covering PCT national/regional phase entry for major patent offices were validated by a domain expert against official PCT fee schedules. The validation confirmed dollar-accurate calculations across all supported jurisdictions. The test suite includes synthetic fee schedule models for USPTO and EPO that demonstrate the language's expressiveness for complex fee structures, though these use representative values rather than tracking current official schedules which are updated annually.
 
 **Construct Validity.** Performance measurements reflect test execution time, not isolated component performance. Claims about syntax readability for domain experts are based on established DSL design principles [16, 23] rather than empirical user studies. The keyword-based syntax (EQ, GT, AND) was designed to improve readability compared to symbolic operators, and the explicit block delimiters (ENDCOMPUTE, ENDDEFINE) were chosen to reduce syntax errors, but **these design hypotheses have not been validated through controlled experiments with practitioners**. This limitation should be considered when evaluating claims about the language's accessibility.
 
@@ -1084,6 +1073,8 @@ All 260 tests pass with 100% success rate. Test execution completes in sub-milli
 **Vendor independence.** IPFLang-based calculations are vendor-neutral: any conforming interpreter can execute scripts. Multiple tools can compete on user experience while using a shared, open calculation engine.
 
 **Rapid adaptation.** Government fee schedules change frequently. IPFLang enables updates through script editing and verification, compared to longer cycles for traditional software development.
+
+**Predictability over AI alternatives.** While general-purpose AI systems can perform fee calculations through natural language processing, DSL code authored by domain experts offers superior predictability and reliability. An IPFLang script encodes explicit, deterministic rules that produce identical outputs for identical inputs across all executions. In contrast, AI-based approaches may exhibit variability in interpretation, sensitivity to prompt phrasing, or unexpected behavior when encountering edge cases outside their training distribution. For regulated domains where calculation accuracy carries legal and financial consequences, the explicit rule encoding of a DSL provides stronger guarantees than probabilistic AI inference, while the human-readable syntax enables domain experts to verify correctness directly against authoritative fee schedules.
 
 ### 8.2 Cross-Domain Applicability
 
@@ -1121,7 +1112,7 @@ This paper introduced IPFLang, a domain-specific language for standardizing inte
 
 4. **Provenance tracking** with counterfactual analysis supporting auditability requirements for regulatory compliance and dispute resolution.
 
-5. **Reference implementation** validated through 266 passing tests, verification against official EPO and USPTO fee schedules, and 118 production jurisdiction files covering PCT national/regional phase entry.
+5. **Reference implementation** validated through 260 passing tests, verification against official EPO and USPTO fee schedules, and 118 production jurisdiction files covering PCT national/regional phase entry.
 
 **Impact.** For practitioners, IPFLang offers transparent, verifiable fee calculations with audit trails. For patent offices, the specification provides machine-readable fee schedule definitions enabling third-party tool development. For the research community, IPFLang demonstrates that formal verification techniques can be applied to domain-specific regulatory contexts.
 
