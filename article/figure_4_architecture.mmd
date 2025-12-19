@@ -1,0 +1,72 @@
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f4f8', 'primaryTextColor': '#1a1a1a', 'primaryBorderColor': '#4a90a4', 'lineColor': '#4a90a4'}}}%%
+
+flowchart TB
+    subgraph input[" Input "]
+        DSL[".ipf Files"]
+        CLI["CLI"]
+        UserInputs["User Inputs"]
+    end
+
+    subgraph engine[" IPFLang Engine "]
+        direction TB
+
+        subgraph parsing[" Parsing "]
+            Lexer["Lexer"]
+            Parser["Parser"]
+            Resolver["Resolver"]
+        end
+
+        subgraph typesystem[" Type System "]
+            TypeChecker["Type Checker"]
+            CurrencyChecker["Currency Checker"]
+            TypeInference["Type Inference"]
+        end
+
+        subgraph analysis[" Static Analysis "]
+            Completeness["Completeness"]
+            Monotonicity["Monotonicity"]
+            DomainAnalyzer["Domain Analyzer"]
+        end
+
+        subgraph evaluation[" Evaluation "]
+            Evaluator["Evaluator"]
+            CaseSelector["Case Selector"]
+            Provenance["Provenance"]
+        end
+    end
+
+    subgraph output[" Output "]
+        FeeResult["Fee Result"]
+        AuditTrail["Audit Trail"]
+        VerificationReport["Reports"]
+        ErrorReport["Errors"]
+    end
+
+    DSL --> Lexer
+    CLI --> UserInputs
+    UserInputs --> Evaluator
+
+    Lexer --> Parser --> Resolver --> TypeChecker
+    TypeChecker --> CurrencyChecker --> TypeInference
+
+    TypeInference --> Completeness
+    TypeInference --> Monotonicity
+    Completeness --> DomainAnalyzer
+    Monotonicity --> DomainAnalyzer
+
+    TypeInference --> Evaluator
+    Evaluator --> CaseSelector --> Provenance
+
+    Provenance --> FeeResult
+    Provenance --> AuditTrail
+    Completeness --> VerificationReport
+    Monotonicity --> VerificationReport
+    TypeChecker --> ErrorReport
+
+    style engine fill:#f8f9fa,stroke:#4a90a4,stroke-width:2px
+    style parsing fill:#e8f4f8,stroke:#4a90a4
+    style typesystem fill:#e8f4f8,stroke:#4a90a4
+    style analysis fill:#fff5e6,stroke:#ffa726
+    style evaluation fill:#f0f7e6,stroke:#7cb342
+    style input fill:#fff,stroke:#999
+    style output fill:#fff,stroke:#999
