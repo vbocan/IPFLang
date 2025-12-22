@@ -880,9 +880,11 @@ The currency-aware type system prevents common errors at compile time:
 |------------|--------|--------|
 | `100<EUR> + 50<EUR>` | ✓ | Same currency |
 | `100<EUR> * 2` | ✓ | Scalar multiplication |
+| `2 * 100<EUR>` | ✓ | Scalar multiplication (commutative) |
 | `100<EUR> / 2` | ✓ | Scalar division |
 | `100<EUR> + 50<USD>` | ✗ | Mixed currencies |
-| `100<EUR> + 50` | ✓ | Plain number compatible |
+| `100<EUR> + 50` | ✗ | Cannot add dimensionless to dimensioned |
+| `100<EUR> - 50` | ✗ | Cannot subtract dimensionless to dimensioned |
 | `CONVERT(x, USD, EUR) + 50<EUR>` | ✓ | Explicit conversion |
 
 Type errors are caught at parse time, long before any calculation runs. This makes IPFLang particularly robust for financial applications where currency mistakes can have serious consequences.
