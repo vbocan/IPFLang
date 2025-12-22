@@ -20,6 +20,10 @@ IPFLang is a domain-specific language (DSL) and execution engine for defining in
 
 ## Quick Start
 
+### Prerequisites
+
+To run IPFLang, **.NET 10** is required. .NET 10 is a cross-platform runtime that supports Windows, macOS, and Linux. You can download the SDK from the [official .NET website](https://dotnet.microsoft.com/download/dotnet/10.0).
+
 ### Installation
 
 ```bash
