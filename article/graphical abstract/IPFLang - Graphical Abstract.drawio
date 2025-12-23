@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0" version="29.2.9">
   <diagram name="Page-1" id="V0S9KSOVo3kJkrFOZBWg">
-    <mxGraphModel dx="1256" dy="1095" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1258" dy="1098" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -12,9 +12,6 @@
         </mxCell>
         <mxCell id="HajG5jjKA_mVEbx3vs9M-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=3;shadow=1;fillColor=#E4F7E3;strokeColor=#82b366;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" value="" vertex="1">
           <mxGeometry height="810" width="500" x="1043" y="97" as="geometry" />
-        </mxCell>
-        <mxCell id="cN_vuCS1hq8n8BItIudq-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=light-dark(#e6e6e6, #ededed);" value="&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 26px;&quot;&gt;&lt;b style=&quot;line-height: 100%;&quot;&gt;IPFLang: A Domain-Specific Language for Standardizing Multi-Jurisdiction Intellectual Property Fee Calculation&lt;/b&gt;&lt;/font&gt;" vertex="1">
-          <mxGeometry height="60" width="1523" x="20" y="20" as="geometry" />
         </mxCell>
         <mxCell id="cN_vuCS1hq8n8BItIudq-18" connectable="0" parent="1" style="group" value="" vertex="1">
           <mxGeometry height="200" width="200" x="50.00000000000003" y="414" as="geometry" />
