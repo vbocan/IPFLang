@@ -223,7 +223,9 @@ dotnet test IPFLang.Engine.Tests
 
 ## Documentation
 
-- **[Syntax Reference](docs/SYNTAX.md)**: Complete IPFLang syntax documentation
+- **[Syntax Reference](docs/IPFLang_syntax.md)**: Complete IPFLang syntax documentation with examples
+- **[Formal Grammar (EBNF)](docs/IPFLang_grammar.md)**: Authoritative EBNF grammar specification
+- **[Type System Manual](docs/type_system_manual.md)**: Beginner-friendly walkthrough of the formal type system
 - **[Examples](examples/)**: Sample fee schedule scripts demonstrating all features
 - **[Article](article/)**: Academic paper describing the DSL design and mathematical foundations
 
