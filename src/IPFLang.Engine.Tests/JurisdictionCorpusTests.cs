@@ -80,6 +80,75 @@ namespace IPFLang.Engine.Tests
             Assert.True(optional >= 0, $"{code}: optional total went negative");
         }
 
+        /// <summary>
+        /// Inheritance has to be load-bearing, not decorative. A member of a regional system must
+        /// take the shared parameters from its base rather than carrying its own copy: a member
+        /// that redeclares everything composes to exactly what it would produce alone, and the
+        /// base becomes a file that looks like a single point of maintenance without being one.
+        /// </summary>
+        [Theory]
+        [InlineData("RO", "BASE_EP")]
+        [InlineData("DE", "BASE_EP")]
+        [InlineData("RU", "BASE_EA")]
+        [InlineData("KE", "BASE_AP")]
+        public void AMemberInheritsTheSharedParametersRatherThanRedeclaringThem(string code, string expectedBase)
+        {
+            Assert.Equal(expectedBase, JurisdictionCorpus.GetBaseNameFor(code));
+
+            var parser = new DslParser();
+            var (alone, _) = parser.Parse(JurisdictionCorpus.GetJurisdiction(code), returnParsedScript: true);
+            Assert.NotNull(alone);
+
+            var chain = JurisdictionCorpus.GetCompositionChain(code);
+            var registry = new JurisdictionRegistry();
+            string? parent = null, leaf = null;
+            foreach (var (id, source) in chain)
+            {
+                var (parsed, _) = parser.Parse(source, returnParsedScript: true);
+                registry.Register(new Jurisdiction(id, id, parsed!, parent));
+                parent = id;
+                leaf = id;
+            }
+            var composed = new JurisdictionComposer(registry).Compose(leaf!);
+
+            // Composing must add something. If it does not, the member is redeclaring the base.
+            Assert.True(composed.Script.Inputs.Count() > alone!.Inputs.Count(),
+                $"{code} composes to no more than it declares alone, so its base contributes nothing");
+
+            // The shared parameters must arrive from the base, not from the member.
+            var declaredLocally = alone.Inputs.Select(i => i.Name).ToHashSet();
+            foreach (var shared in new[] { "EntitySize", "ClaimCount", "SheetCount", "ApplicationDate" })
+            {
+                Assert.DoesNotContain(shared, declaredLocally);
+                Assert.Contains(composed.Script.Inputs, i => i.Name == shared);
+            }
+        }
+
+        /// <summary>
+        /// The consequence of the property above: an edit to a base reaches its members.
+        /// </summary>
+        [Fact]
+        public void EditingABaseReachesTheJurisdictionsThatExtendIt()
+        {
+            var parser = new DslParser();
+
+            // Widen the claim range in the base only.
+            var edited = JurisdictionCorpus.GetBase("BASE_EP")
+                .Replace("DEFINE NUMBER ClaimCount AS 'Number of claims'", "DEFINE NUMBER ClaimCount AS 'Claims, revised'");
+
+            var (baseScript, _) = parser.Parse(edited, returnParsedScript: true);
+            var (member, _) = parser.Parse(JurisdictionCorpus.GetJurisdiction("RO"), returnParsedScript: true);
+
+            var registry = new JurisdictionRegistry();
+            registry.Register(new Jurisdiction("BASE_EP", "BASE_EP", baseScript!, null));
+            registry.Register(new Jurisdiction("RO", "RO", member!, "BASE_EP"));
+
+            var composed = new JurisdictionComposer(registry).Compose("RO");
+            var claims = Assert.Single(composed.Script.Inputs.Where(i => i.Name == "ClaimCount"));
+
+            Assert.Equal("Claims, revised", claims.Text);
+        }
+
         private static List<IPFValue> DefaultsFor(IEnumerable<DslInput> inputs)
         {
             var values = new List<IPFValue>();

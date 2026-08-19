@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <PackageId>IPFLang.Engine</PackageId>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>Valer Bocan</Authors>
     <Company>Politehnica University of Timisoara</Company>
     <Title>IPFLang Engine</Title>
