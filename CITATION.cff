@@ -1,7 +1,7 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software, please cite the article under preferred-citation; to cite the software itself, use the metadata below."
 title: "IPFLang: Domain-Specific Language for Intellectual Property Fee Calculations"
-version: 1.0.0
+version: 1.2.0
 date-released: 2025-12-15
 abstract: "A domain-specific language and execution engine for defining intellectual property fee calculations with advanced features including currency-aware type system, completeness verification, provenance tracking, temporal operations, and version management."
 authors:
@@ -10,8 +10,9 @@ authors:
     name-suffix: "Ph.D., CSSLP"
     email: "valer.bocan@upt.ro"
     orcid: "https://orcid.org/0009-0006-9084-4064"
-repository-code: "https://github.com/vbocan/ipflang"
-url: "https://github.com/vbocan/ipflang"
+    affiliation: "Politehnica University of Timisoara"
+repository-code: "https://github.com/vbocan/IPFLang"
+url: "https://github.com/vbocan/IPFLang"
 license: GPL-3.0
 keywords:
   - domain-specific language
@@ -26,3 +27,21 @@ keywords:
   - completeness verification
   - monotonicity checking
 type: software
+
+# The language, its type system and its static verification are described in the article
+# below. Tag v1.0.0 of this repository marks the implementation that article evaluates;
+# development continues past it.
+preferred-citation:
+  type: article
+  title: "IPFLang: A Domain-Specific Language for Multi-Currency Regulatory Fee Computation with Static Verification"
+  journal: "IEEE Open Journal of the Computer Society"
+  year: 2026
+  authors:
+    - family-names: "Bocan"
+      given-names: "Valer"
+      orcid: "https://orcid.org/0009-0006-9084-4064"
+      affiliation: "Politehnica University of Timisoara"
+    - family-names: "Balas"
+      given-names: "Valentina E."
+      orcid: "https://orcid.org/0000-0003-0885-1283"
+      affiliation: "Aurel Vlaicu University of Arad"

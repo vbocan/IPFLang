@@ -1,7 +1,7 @@
 namespace IPFLang.Evaluator
 {
     /// <summary>
-    /// Represents a currency-annotated literal value like 100<EUR>
+    /// Represents a currency-annotated literal value like 100&lt;EUR&gt;
     /// At runtime, evaluates to its numeric value (currency is validated at type-check time)
     /// </summary>
     public class NodeCurrencyLiteral : Node

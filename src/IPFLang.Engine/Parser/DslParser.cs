@@ -71,7 +71,10 @@ namespace IPFLang.Parser
                 ParseVerifyMonotonic
             };
 
-            string[] IPFData = source.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            // Split on any line ending rather than the host platform's own. A script may reach
+            // the parser from a database, an HTTP payload, or a file authored on another
+            // operating system, so its line endings are not the running platform's to assume.
+            string[] IPFData = source.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
 
             for (int i = 0; i < IPFData.Length; i++)
             {

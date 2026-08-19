@@ -91,7 +91,7 @@ namespace IPFLang.Types
     }
 
     /// <summary>
-    /// Type variable for polymorphic type parameters (e.g., C in FEE<C>)
+    /// Type variable for polymorphic type parameters (e.g., C in FEE&lt;C&gt;)
     /// </summary>
     public record IPFTypeVariable : IPFType
     {

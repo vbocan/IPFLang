@@ -4,6 +4,7 @@ using IPFLang.Evaluator;
 using IPFLang.Parser;
 using IPFLang.Provenance;
 using IPFLang.Types;
+using IPFLang.Versioning;
 
 namespace IPFLang.Engine
 {
@@ -11,6 +12,14 @@ namespace IPFLang.Engine
     {
         void Reset();
         bool Parse(string text);
+
+        /// <summary>
+        /// Load an already-parsed script, bypassing <see cref="Parse(string)"/>.
+        /// Required to execute the output of <c>JurisdictionComposer.Compose</c>,
+        /// since a composed script has no single source text to re-parse.
+        /// </summary>
+        void LoadParsedScript(ParsedScript script);
+
         (decimal, decimal, IEnumerable<string>, IEnumerable<(string, string)>) Compute(IEnumerable<IPFValue> InputValues);
         IEnumerable<string> GetErrors();
         IEnumerable<TypeError> GetTypeErrors();
