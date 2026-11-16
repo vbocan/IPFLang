@@ -214,6 +214,72 @@ namespace IPFLang.Engine.Tests
 
         #endregion
 
+        #region Fee Return Currency Parsing Tests (T-FEE-RETURN)
+
+        [Fact]
+        public void TestFeeWithReturnCurrency()
+        {
+            string text =
+            """
+            COMPUTE FEE FilingFee RETURN EUR
+            YIELD 135<EUR>
+            ENDCOMPUTE
+            """;
+            var p = new DslParser();
+            Assert.True(p.Parse(text));
+            var fee = p.GetFees().Single();
+            Assert.Equal("FilingFee", fee.Name);
+            Assert.False(fee.IsPolymorphic);
+            Assert.Equal("EUR", fee.ReturnCurrency);
+            Assert.False(fee.Optional);
+        }
+
+        [Fact]
+        public void TestFeeWithReturnCurrencyOptional()
+        {
+            string text =
+            """
+            COMPUTE FEE FilingFee RETURN EUR OPTIONAL
+            YIELD 135<EUR>
+            ENDCOMPUTE
+            """;
+            var p = new DslParser();
+            Assert.True(p.Parse(text));
+            var fee = p.GetFees().Single();
+            Assert.Equal("EUR", fee.ReturnCurrency);
+            Assert.True(fee.Optional);
+        }
+
+        [Fact]
+        public void TestFeeWithInvalidReturnCurrency()
+        {
+            string text =
+            """
+            COMPUTE FEE FilingFee RETURN EURO
+            YIELD 135<EUR>
+            ENDCOMPUTE
+            """;
+            var p = new DslParser();
+            Assert.False(p.Parse(text));
+            Assert.Contains(p.GetErrors(), e => e.Item2.Contains("ISO 4217"));
+        }
+
+        [Fact]
+        public void TestFeeReturnCurrencyMismatchIsTypeError()
+        {
+            string text =
+            """
+            COMPUTE FEE FilingFee RETURN EUR
+            YIELD 135<USD>
+            ENDCOMPUTE
+            """;
+            var calc = new DslCalculator(new DslParser());
+            Assert.False(calc.Parse(text));
+            Assert.NotEmpty(calc.GetTypeErrors());
+        }
+
+        #endregion
+
         #region Type Checker Tests
 
         [Fact]

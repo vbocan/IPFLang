@@ -649,12 +649,24 @@ namespace IPFLang.Parser
             }
             else
             {
-                // Non-polymorphic fee: COMPUTE FEE Name [OPTIONAL]
-                if (tokens.Length == 4 && tokens[3] == "OPTIONAL")
+                // Non-polymorphic fee: COMPUTE FEE Name [RETURN CUR] [OPTIONAL], as the grammar
+                // and the type system's rule T-FEE-RETURN define it. The type checker already
+                // enforces a declared return currency; the parser used to reject the clause.
+                var rest = tokens.Skip(3).ToList();
+                if (rest.Count >= 2 && rest[0] == "RETURN")
+                {
+                    returnCurrency = rest[1];
+                    if (!Types.Currency.IsValid(returnCurrency))
+                    {
+                        throw new ArgumentException($"Return currency '{returnCurrency}' of fee '{feeName}' is not a valid ISO 4217 currency");
+                    }
+                    rest = rest.Skip(2).ToList();
+                }
+                if (rest.Count == 1 && rest[0] == "OPTIONAL")
                 {
                     isOptional = true;
                 }
-                else if (tokens.Length != 3)
+                else if (rest.Count != 0)
                 {
                     return false;
                 }
